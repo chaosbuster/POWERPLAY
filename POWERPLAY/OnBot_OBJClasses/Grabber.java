@@ -9,9 +9,8 @@ public class Grabber extends BlocksOpModeCompanion {
 
   static public Servo servoGrabber;
 
-  static double scaledPositionGrab;
-  static double scaledPositionRelease;
-
+  static double scaledPositionGrab;       // Calculated in the init
+  static double scaledPositionRelease;    // Calculated in the init
 
   @ExportToBlocks (
     heading = "Initialize Grabber",
@@ -46,6 +45,28 @@ public class Grabber extends BlocksOpModeCompanion {
       telemetry.addData("Scaled Grab Position", scaledPositionGrab);
       telemetry.addData("Scaled Release Position", scaledPositionRelease);
   }
+
+  @ExportToBlocks (
+    heading = "Is Grabber Closed",
+    color = 255,
+    comment = "Returns whether the grabber is closed.",
+    tooltip = "Returns a TRUE if grabber is closed."
+  )
+  /**
+   * Determines whether the grabber is closed and returns:
+   *    TRUE Grabber IS closed
+   *    FALSE Grabber is NOT closed
+   */
+  public static boolean isGrabberClosed() {
+    double servoPosition = servoGrabber.getPosition();
+    
+    // Check to see if grabber servo position is close enough to the close set position
+    if (Math.abs(servoPosition - scaledPositionGrab) < 0.05) 
+      return true;
+    else
+      return false;
+    
+  }  // end method isGrabberClosed()
 
   @ExportToBlocks (
     heading = "Close Grabber",
