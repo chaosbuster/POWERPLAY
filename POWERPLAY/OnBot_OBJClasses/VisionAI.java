@@ -20,8 +20,8 @@ public class VisionAI extends BlocksOpModeCompanion  {
 
   static String curTilePosition;  // String with format of "Column" + "Row"
   
-  static public VuforiaCurrentGame vuforiaPOWERPLAY;
-  static public Tfod tfod;
+  static public VuforiaCurrentGame vuforiaPOWERPLAY = new VuforiaCurrentGame();
+  static public Tfod tfod = new Tfod();
 
    // Vuforia names for all of our Trackable images on the field
   static final String constantTrackableB1 = "Blue Audience Wall";
@@ -115,6 +115,12 @@ public class VisionAI extends BlocksOpModeCompanion  {
     optionsTrackable.add(constantTrackableE6);
     optionsCamViewFront.add(constantWebcam1);
     optionsCamViewSide.add(constantWebcam2);
+    
+    //Set information to display at next telemetry update
+    telemetry.addData("camViewFront", camViewFront);
+    telemetry.addData("camViewSide", camViewSide);
+    telemetry.addData("Active Camera", activeCamera);
+    telemetry.addData("Current Tile Position", curTilePosition);
  
   } // end method initVisionAI()
  
@@ -144,7 +150,45 @@ public class VisionAI extends BlocksOpModeCompanion  {
         90, // secondAngle
         0, // thirdAngle
         true); // useCompetitionFieldTargetLocations
+        
   }  // end method initVuforia()
+
+  @ExportToBlocks (
+    heading = "Vision AI",
+    color = 32,
+    comment = "Activate Vuforia.",
+    tooltip = "Assumes Vuforia has been initialized."
+  )
+   /** Activate Vuforia
+    */
+  static public void activateVuforia(){
+    vuforiaPOWERPLAY.activate();
+  }  // end method activateVuforia() 
+
+  @ExportToBlocks (
+    heading = "Vision AI",
+    color = 32,
+    comment = "Deactivate Vuforia.",
+    tooltip = "Assumes Vuforia is active."
+  )
+   /** Deactivate Vuforia
+    */
+  static public void deactivateVuforia(){
+    vuforiaPOWERPLAY.deactivate();
+  }  // end method deactivateVuforia() 
+
+  @ExportToBlocks (
+    heading = "Vision AI",
+    color = 32,
+    comment = "Close Vuforia.",
+    tooltip = "Assumes Vuforia has been deactivated."
+  )
+   /** Close Vuforia
+    */
+  static public void closeVuforia(){
+    vuforiaPOWERPLAY.close();
+  }  // end method closeVuforia() 
+  
 
   @ExportToBlocks (
     heading = "Vision AI",
@@ -172,6 +216,45 @@ public class VisionAI extends BlocksOpModeCompanion  {
     tfod.setZoom(1, 16 / 9);
     
   }  // end method initTensorflow()
+  
+  
+  @ExportToBlocks (
+    heading = "Vision AI",
+    color = 32,
+    comment = "Activate Tensorflow.",
+    tooltip = "Assumes Tensorflow has been initialized."
+  )
+   /** Activate Tensorflow
+    */
+  static public void activateTensorflow(){
+    tfod.activate();
+  }  // end method activateTensorflow() 
+
+  @ExportToBlocks (
+    heading = "Vision AI",
+    color = 32,
+    comment = "Deactivate Tensorflow.",
+    tooltip = "Assumes Tensorflow is active."
+  )
+   /** Deactivate Tensorflow
+    */
+  static public void deactivateTensorflow(){
+    tfod.deactivate();
+  }  // end method deactivateTensorflow() 
+
+  @ExportToBlocks (
+    heading = "Vision AI",
+    color = 32,
+    comment = "Close Tensorflow.",
+    tooltip = "Assumes Tensorflow has been deactivated."
+  )
+   /** Close Tensorflow
+    */
+  static public void closeTensorflow(){
+    tfod.close();
+  }  // end method closeTensorflow() 
+    
+
 
   @ExportToBlocks (
     heading = "Vision AI",
@@ -356,12 +439,12 @@ public class VisionAI extends BlocksOpModeCompanion  {
     
   }  // end method determineInitialTilePosition()
 
-  @ExportToBlocks (
-    heading = "Trackables",
-    color = 32,
-    comment = "Runs through each potential Trackable to see if it is visible",
-    tooltip = "Returns the Trackable name that is found. Returns null String if none are found."
-  )
+  //@ExportToBlocks (
+  //  heading = "Trackables",
+  //  color = 32,
+  //  comment = "Runs through each potential Trackable to see if it is visible",
+  //  tooltip = "Returns the Trackable name that is found. Returns null String if none are found."
+  //)
    /** Runs through each potential Trackable to see if it is visible
     *  Returns the Trackable name that is found.
     */
@@ -385,14 +468,14 @@ public class VisionAI extends BlocksOpModeCompanion  {
     return Trackable;
   }  // end method identifyVisibleTrackable()
 
-  @ExportToBlocks (
-    heading = "Trackables",
-    color = 32,
-    comment = "Runs through the TrackingResults to see if the specified Trackable is visible" +
-              "Returns true if the given Trackable by Name is found.",
-    tooltip = "A trackable is not always visible based obstacles in the way of the cameras.",
-    parameterLabels = {"Trackable Name"}
-  )
+  //@ExportToBlocks (
+  //  heading = "Trackables",
+  //  color = 32,
+  //  comment = "Runs through the TrackingResults to see if the specified Trackable is visible" +
+  //            "Returns true if the given Trackable by Name is found.",
+  //  tooltip = "A trackable is not always visible based obstacles in the way of the cameras.",
+  //  parameterLabels = {"Trackable Name"}
+  //)
    /** Runs through the TrackingResults to see if the specified Trackable is visible
     *  Returns true if the given Trackable by Name is found.
     */
@@ -413,13 +496,13 @@ public class VisionAI extends BlocksOpModeCompanion  {
     return isVisible;
   }  // end method isTargetVisible()
 
-  @ExportToBlocks (
-    heading = "Parking Signal",
-    color = 32,
-    comment = "Looks through all the object recognitions and determine which parking location it correlates to, if any." +
-              "The parking location are for a default signal tensorflow model.",
-    tooltip = "Returns [1,2,3] or 0 if did not recognize any signals in the line of sight."
-  )
+  //@ExportToBlocks (
+  //  heading = "Parking Signal",
+  //  color = 32,
+  //  comment = "Looks through all the object recognitions and determine which parking location it correlates to, if any." +
+  //            "The parking location are for a default signal tensorflow model.",
+  //  tooltip = "Returns [1,2,3] or 0 if did not recognize any signals in the line of sight."
+  //)
    /** Runs through all the object recognitions
     *  Compares an object label from our known custom signal labels
     *  Returns the Parking Location if Signal found.  Otherwise, returns 0.
@@ -459,15 +542,15 @@ public class VisionAI extends BlocksOpModeCompanion  {
     return ParkingLocationOfLabel;
   }  // end method identifyParkingLocationFromDefaultSignal()
 
-  @ExportToBlocks (
-    heading = "Parking Signal",
-    color = 32,
-    comment = "Given a label string it will determine whether it correlates to a parking location." +
-              "The parking location are for a default signal tensorflow model.",
-    tooltip = "The parking location returned is [1,2,3]." +
-              "If 0 is returned it did not find a correlated label to the string provided.",
-    parameterLabels = {"Found Label"}
-  )
+  //@ExportToBlocks (
+  //  heading = "Parking Signal",
+  //  color = 32,
+  //  comment = "Given a label string it will determine whether it correlates to a parking location." +
+  //            "The parking location are for a default signal tensorflow model.",
+  //  tooltip = "The parking location returned is [1,2,3]." +
+  //            "If 0 is returned it did not find a correlated label to the string provided.",
+  //  parameterLabels = {"Found Label"}
+  //)
    /** Compares an object label from our known custom signal labels
     */
   static public int labelIndexFromDefaultPOWERPLAY(String foundLabel)  {
@@ -486,13 +569,13 @@ public class VisionAI extends BlocksOpModeCompanion  {
   }  // end method labelIndexFromDefaultPOWERPLAY()
 
 
-  @ExportToBlocks (
-    heading = "Parking Signal",
-    color = 32,
-    comment = "Looks through all the object recognitions and determine which parking location it correlates to, if any." +
-              "The parking location are for a custom signal tensorflow model.",
-    tooltip = "Returne [1,2,3] or 0 if did not recognize any signals in the line of sight."
-  )
+  //@ExportToBlocks (
+  //  heading = "Parking Signal",
+  //  color = 32,
+  //  comment = "Looks through all the object recognitions and determine which parking location it correlates to, if any." +
+  //            "The parking location are for a custom signal tensorflow model.",
+  //  tooltip = "Returne [1,2,3] or 0 if did not recognize any signals in the line of sight."
+  //)
    /** Runs through all the object recognitions
     *  Compares an object label from our known custom signal labels
     *  Returns the Parking Location if Signal found.  Otherwise, returns 0.
@@ -532,15 +615,15 @@ public class VisionAI extends BlocksOpModeCompanion  {
     return ParkingLocationOfLabel;
   }  // end method identifyParkingLocationFromCustomSignal()
 
-  @ExportToBlocks (
-    heading = "Parking Signal",
-    color = 32,
-    comment = "Given a label string it will determine whether it correlates to a parking location." +
-              "The parking location are for a custom signal tensorflow model.",
-    tooltip = "The parking location returned is [1,2,3]." +
-              "If 0 is returned it did not find a correlated label to the string provided.",
-    parameterLabels = {"Found Label"}
-  )
+  //@ExportToBlocks (
+  //  heading = "Parking Signal",
+  //  color = 32,
+  //  comment = "Given a label string it will determine whether it correlates to a parking location." +
+  //            "The parking location are for a custom signal tensorflow model.",
+  //  tooltip = "The parking location returned is [1,2,3]." +
+  //            "If 0 is returned it did not find a correlated label to the string provided.",
+  //  parameterLabels = {"Found Label"}
+  //)
    /** Compares an object label from our known custom signal labels
     */
   static public int labelIndexFromCustomSignal(String foundLabel) {

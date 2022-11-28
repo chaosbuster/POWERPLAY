@@ -43,6 +43,9 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
 
     // Configuration settings if starting in F5
     optionsInitialTilePosition.add("F5");
+    
+    // Set information to display at next telemetry update
+    telemetry.addData("Our Tile Position", ourInitialPosition);
 
   }  // end method setConfigurationOptions()
   
@@ -55,7 +58,7 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
   )
    /** Sets the actual robot configuration based on what cameras have seen during Init.
     */
-  static public void initConfiguration(String ourInitialPosition) {
+  static public void SetOurInitialConfiguration(String ourInitialPosition) {
       
     // See if we were able to determine our Initial Position  
     if (ourInitialPosition.length() < 2) {
@@ -82,7 +85,7 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
 
 
   @ExportToBlocks (
-    heading = "SC: Parking Location",
+    heading = "Startup Configurator",
     color = 32,
     comment = "Determines the Parking Tile Position in which we want to park",
     tooltip = "Assumes we are heading to the column that has the stacks of cones.",
