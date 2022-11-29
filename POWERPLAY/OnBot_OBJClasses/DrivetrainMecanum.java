@@ -7,6 +7,15 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
 
+// For IMU
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+
 public class DrivetrainMecanum extends BlocksOpModeCompanion {
     
     // Variables for the hardware configuration names of our drive motors
@@ -31,9 +40,37 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     // Define our motor variables
     static DcMotor driveLeftFront, driveLeftBack, driveRightFront, driveRightBack;
     
+    // Define IMU
+    static BNO055IMU imu;
+    static BNO055IMU.Parameters imuParameters;
+    static Orientation angles;
+    static Acceleration gravity;
 
     @ExportToBlocks (
-        heading = "initDrivetrainMotors",
+        heading = "Drivetrain",
+        color = 255,
+        comment = "Initialize Drivetrain and Pose",
+        tooltip = "Initialize Drivetrain and Pose",
+        parameterLabels = {"Left Front Drive Motor Name",
+                           "Left Back Drive Motor Name",
+                           "Right Front Drive Motor Name",
+                           "Right Back Drive Motor Name"}
+    )
+    /** Initialize drivetrain and pose
+     */
+    public static void initDriveTrain(String driveLeftFrontName, String driveLeftBackName, String driveRightFrontName, String driveRightBackName) {
+       
+       // Initialize our drive train motors
+       initDrivetrainMotors(driveLeftFrontName, driveLeftBackName, driveRightFrontName, driveRightBackName);
+       
+       // Initialize our IMU for pose information
+       initIMU();
+
+    }
+    
+    
+    @ExportToBlocks (
+        heading = "Drivetrain: Motors",
         color = 255,
         comment = "Initialize variables for our drivetrain motors.",
         tooltip = "Initialize variables for our drivetrain motors.",
@@ -85,9 +122,106 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
         powerLevelElapsedTime = powerLevelChangeTimer.milliseconds();
         telemetry.addData("Power Change Timer:", powerLevelElapsedTime);
     
-    }   // end method initDrivetrainMotors()
+    }  // end method initDrivetrainMotors()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Pose",
+        color = 255,
+        comment = "Initialize IMU variables.",
+        tooltip = "Initialize IMU variables."
+    )
+    /** Initialize IMU and its parameters:
+     *    > Angles
+     *    > Gravity
+     */
+    public static void initIMU() {
+
+      imu = hardwareMap.get(BNO055IMU.class, "imu");
+      // Create new IMU Parameters object.
+      imuParameters = new BNO055IMU.Parameters();
+      
+      // Use degrees as angle unit.
+      imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+      // Express acceleration as m/s^2.
+      imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+      // Disable logging.
+      imuParameters.loggingEnabled = false;
+
+      // Initialize IMU.
+      imu.initialize(imuParameters);
+    
+    }  // end method initIMU()
+
+    @ExportToBlocks (
+        heading = "Drivetrain: Pose",
+        color = 255,
+        comment = "Get latest IMU angles.",
+        tooltip = "Get latest IMU angles."
+    )
+    /** Get latest IMU angles
+     */
+    public static Orientation getLatestIMUAngles() {
+      // Get latest IMU value
+      angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+    
+      setToDisplayOrientation(angles);
+      
+      return angles; 
+      
+    }  // end method getLatestIMUAngles()
+    
+    @ExportToBlocks (
+        heading = "Drivetrain: Pose",
+        color = 255,
+        comment = "Set to Display IMU angles at the next telemetry update.",
+        tooltip = "Need to call telemetry update."
+    )
+    /**
+    * Sets to display the IMU angles at the next telemetry update
+    */
+    public static void setToDisplayOrientation(Orientation angles) {
+      telemetry.addData("rot about Z", angles.firstAngle);
+      telemetry.addData("rot about Y", angles.secondAngle);
+      telemetry.addData("rot about X", angles.thirdAngle);
+    } // end method setToDisplayOrientation()
+    
+    @ExportToBlocks (
+        heading = "Drivetrain: Pose",
+        color = 255,
+        comment = "Get latest IMU gravity.",
+        tooltip = "Get latest IMU gravity."
+    )
+    /** Get latest IMU gravity
+     */
+    public static Acceleration getLatestIMUGravity() {
+      // Get latest IMU value
+      gravity = imu.getGravity();
+      
+      setToDisplayGravitationalAcceleration(gravity);
+      
+      return gravity;
+      
+    }   // end method getLatestIMUGravity()
+    
+    @ExportToBlocks (
+        heading = "Drivetrain: Pose",
+        color = 255,
+        comment = "Set to display IMU gravity at the next telemetry update.",
+        tooltip = "Need to call telemetry update."
+    )
+    /**
+     * Sets to display the IMU gravity at the next telemetry update
+     */
+   public static void setToDisplayGravitationalAcceleration(Acceleration gravity) {
+     // Get acceleration due to force of gravity.
+     telemetry.addData("gravity (Z)", gravity.zAccel);
+     telemetry.addData("gravity (Y)", gravity.yAccel);
+     telemetry.addData("gravity (X)", gravity.xAccel);
+   } // end method setToDisplayGravitationalAcceleration()
+
+    @ExportToBlocks (
+        heading = "Drivetrain: Information",
+        color = 255,
         comment = "Add Drivetrain info to Telemetry",
         tooltip = "Add Drivetrain info to Telemetry",
         parameterLabels = { }
@@ -106,7 +240,7 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }   // end method setToDisplayDrivetrainInfo()
 
     @ExportToBlocks (
-        heading = "Set Drive To X Config",
+        heading = "Drivetrain: Configurations",
         color = 255,
         comment = "Set drive to X Config.",
         tooltip = "Set drive to X Config."
@@ -135,7 +269,7 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     } // end method setDriveToXConfig()
     
     @ExportToBlocks (
-        heading = "Set Drive To A Config",
+        heading = "Drivetrain: Configurations",
         color = 255,
         comment = "Set drive to A Config.",
         tooltip = "Set drive to A Config."
@@ -163,7 +297,7 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     } // end method setDriveToAConfig()
     
     @ExportToBlocks (
-        heading = "Set Drive To B Config",
+        heading = "Drivetrain: Configurations",
         color = 255,
         comment = "Set drive to B Config.",
         tooltip = "Set drive to B Config."
@@ -191,7 +325,7 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     } // end method setDriveToBConfig()
     
     @ExportToBlocks (
-        heading = "Set Drive To Y Config",
+        heading = "Drivetrain: Configurations",
         color = 255,
         comment = "Set drive to Y Config.",
         tooltip = "Set drive to Y Config."
@@ -219,6 +353,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     } // end method setDriveToYConfig()
     
     @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
         comment = "Stops drivetrain movement",
         tooltip = "Stops drivetrain movement",
         parameterLabels = { }
@@ -237,6 +373,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }   // end method stopDrivetrain()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
         comment = "Moves robot forward",
         tooltip = "Moves robot forward",
         parameterLabels = { }
@@ -265,6 +403,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }   // end method moveForward()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
         comment = "Moves robot backward",
         tooltip = "Moves robot backward",
         parameterLabels = {}
@@ -294,6 +434,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }   // end method moveBackward()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
         comment = "Moves robot left",
         tooltip = "Moves robot left",
         parameterLabels = {}
@@ -325,6 +467,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }   // end method moveLeft()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
         comment = "Moves robot right",
         tooltip = "Moves robot right",
         parameterLabels = {}
@@ -357,6 +501,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }   // end method moveRight()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
         comment = "Turns robot clockwise",
         tooltip = "Turns robot clockwise",
         parameterLabels = {}
@@ -391,9 +537,10 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }   // end method turnClockwise()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
         comment = "Turns robot counterclockwise",
-        tooltip = "Turns robot counterclockwise",
-        parameterLabels = {}
+        tooltip = "Turns robot counterclockwise"
     )
     /**
      * Turns robot counterclockwise
@@ -421,6 +568,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }  // end method turnCounterClockwise()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Information",
+        color = 255,
         comment = "Returns Current Power Level of Drivetrain",
         tooltip = "Returns Current Power Level of Drivetrain",
         parameterLabels = {}
@@ -434,6 +583,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }  // end method getPowerLevel()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
         comment = "Increases Power Level of All Movements",
         tooltip = "Increases Power Level of All Movements",
         parameterLabels = {}
@@ -482,6 +633,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     }  // end method increasePowerLevel()
 
     @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
         comment = "Decreases Power Level of All Movements",
         tooltip = "Decreases Power Level of All Movements",
         parameterLabels = {}
