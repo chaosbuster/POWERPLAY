@@ -73,7 +73,7 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
         index = optionsInitialTilePosition.indexOf(ourInitialPosition) + 1;
         curTilePosition = (((String) JavaUtil.inListGet(optionsInitialTilePosition, JavaUtil.AtMode.FROM_START, (index - 1), false)));
 
-        VisionAI.initCamerasBasedOnConfiguration(index);
+        // TODO: VisionAI.initCamerasBasedOnConfiguration(index);
       
         // Set information to display at the next telemetry update
       telemetry.addData("initConfiguration: Our Initial Position", ourInitialPosition);
@@ -98,7 +98,7 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
     // Front camera is towards Signal
     // In Init so can't move cameras
     // *********************************
-    index = VisionAI.identifyParkingLocationFromCustomSignal();
+    // TODO:  index = VisionAI.identifyParkingLocationFromCustomSignal();
     
     // TODO: Parking Position versus Tile Row to Park per Initial Position
     

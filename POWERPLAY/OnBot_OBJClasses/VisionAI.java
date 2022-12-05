@@ -1,74 +1,129 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
-import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.tfod.Tfod;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import java.util.List;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaCurrentGame;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaBase;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaCurrentGame;
+import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
+
+import java.util.List;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.SwitchableCamera;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
+import java.util.ArrayList;
+
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XZY;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
+
+
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.Tfod;
 
 public class VisionAI extends BlocksOpModeCompanion  {
-
-  static String curTilePosition;  // String with format of "Column" + "Row"
-  
-  static public VuforiaCurrentGame vuforiaPOWERPLAY = new VuforiaCurrentGame();
-  static public Tfod tfod = new Tfod();
-
-   // Vuforia names for all of our Trackable images on the field
-  static final String constantTrackableB1 = "Blue Audience Wall";
-  static final String constantTrackableB6 = "Blue Rear Wall";
-  static final String constantTrackableE1 = "Red Audience Wall";
-  static final String constantTrackableE6 = "Red Rear Wall";
-  
- // Handles for each of our webcams
-  static final String constantWebcam1 = "Webcam 1";
-  static final String constantWebcam2 = "Webcam 2";
-
-  static String activeCamera;
-  static String camViewFront;
-  static String camViewSide;
-  
-  static final int constantTimeBetweenCamerasMSec = 5000;
-  static ElapsedTime timerSwitchCameras = new ElapsedTime();
-  
-  static int ParkingLocationOfLabel;
- 
-  // Default POWERPLAY Signal Tensorflow Model
-  // 1 Gear, 2 Bear,3 Scratch
-  static final String tfDefaultLabelParkingLocation1 = "Gear";
-  static final String tfDefaultLabelParkingLocation2 = "Bear";
-  static final String tfDefaultLabelParkingLocation3 = "Scratch";
-  
-  static String[] labelsCustomTFModel = {"Gear", "Bear", "Scratch"};
-  
     
-  // Custom Signal Tensorflow Model
-  // 1 Gear, 2 Bear, 3 Scratch
-  static final String tfCustomLabelParkingLocation1 = "Gear";
-  static final String tfCustomLabelParkingLocation2 = "Bear";
-  static final String tfCustomLabelParkingLocation3 = "Scratch";
+    /*
+     * Specify the source for the Tensor Flow Model.
+     * If the TensorFlowLite object model is included in the Robot Controller App as an "asset",
+     * the OpMode must to load it using loadModelFromAsset().  However, if a team generated model
+     * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
+     * Here we assume it's an Asset.    Also see method initTfod() below .
+     */
+    //private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final String TFOD_MODEL_FILE  = "GBS_253_ssd_v2_fpnlite_320x320_metadata.tflite";
 
-  // Initialize our Lists for configuration settings
-  static List<String> optionsInitialTilePosition; 
-  static List<String> optionsTrackable;
-  static List<String> optionsCamViewFront;
-  static List<String> optionsCamViewSide;
+    private static final String[] LABELS = {
+            "1 Gear",
+            "2 Bear",
+            "3 Scratch"
+    };
+    
+    /*
+     * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
+     * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
+     * A Vuforia 'Development' license key, can be obtained free of charge from the Vuforia developer
+     * web site at https://developer.vuforia.com/license-manager.
+     *
+     * Vuforia license keys are always 380 characters long, and look as if they contain mostly
+     * random data. As an example, here is a example of a fragment of a valid key:
+     *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
+     * Once you've obtained a license key, copy the string from the Vuforia web site
+     * and paste it in to your code on the next line, between the double quotes.
+     */
+    private static final String VUFORIA_KEY =
+            "ATMTwqP/////AAABmbJZDQrx302NndMyOIh0wdhCgAs4qfPWCBF66qx8jDGtA1RaCQUF/nQdK1LVD+e7V1VqVnq9qCHkKRXwAnpsHT+evkaZECFu4mj3lxNFaCT91Cx6fHGzKer7kUE+7YGj+Cf5fIJqCgxB1rR+FMGRHOTBnnMojuDq/gZnyW5mJVWk/XepDHJiU51AhUSd8hvthylxaXSF5Cbpnowx7BMYHOYYA0SNWt9KgPEOjk6VblPoDzcbJjsVEvI55ZSLk3FphhWH0iBsBT7+fJzd5hHjlt+L99erhiExlAfn3FnMRoBqeSSWLWFtAnjoGvFy6upt556ziiGARTxjQGtCW3Pec6Tt5LMDPznLvIwbGUxQnU3m";
+
+    // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
+    // We will define some constants and conversions here
+    private static final float mmPerInch        = 25.4f;
+    private static final float mmTargetHeight   = 6 * mmPerInch;          // the height of the center of the target image above the floor
+    private static final float halfField        = 72 * mmPerInch;
+    private static final float halfTile         = 12 * mmPerInch;
+    private static final float oneAndHalfTile   = 36 * mmPerInch;
+
+    // Class Members
+    static public OpenGLMatrix lastLocation   = null;
+    static public VuforiaTrackables targets   = null ;
+    static List<VuforiaTrackable> allTrackables = null;
+    static private boolean targetVisible       = false;
+    static public VuforiaCurrentGame vuforiaPOWERPLAY = null;
+    
+    /**
+     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
+     * localization engine.
+     */
+    static public VuforiaLocalizer vuforia;
+
+    /**
+     * Variables used for switching cameras.
+     */
+    static private WebcamName webcam1, webcam2;
+    static private SwitchableCamera switchableCamera;
+    static private boolean oldLeftBumper;
+    static private boolean oldRightBumper;
+
+    /**
+     * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
+     * Detection engine.
+     */
+    static private TFObjectDetector tfod;
+    
+    static String curTilePosition;  // String with format of "Column" + "Row"
+
+    // Vuforia names for all of our Trackable images on the field
+    static final String constantTrackableB1 = "Blue Audience Wall";
+    static final String constantTrackableB6 = "Blue Rear Wall";
+    static final String constantTrackableE1 = "Red Audience Wall";
+    static final String constantTrackableE6 = "Red Rear Wall";
   
-  // Initialize our Lists for configuration settings
-  //static List<String> optionsInitialTilePosition = {"A2","A5", "F2","F5" }; 
-  //static List<String> optionsTrackable = {constantTrackableB1, constantTrackableB6, constantTrackableE1, constantTrackableE6};
-  //static List<String> optionsCamViewFront = {constantWebcam1, constantWebcam2, constantWebcam2, constantWebcam1};
-  //static List<String> optionsCamViewSide = {constantWebcam2, constantWebcam1, constantWebcam1, constantWebcam2};
+    // Handles for each of our webcams
+    static final String constantWebcam1 = "Webcam 1";
+    static final String constantWebcam2 = "Webcam 2";
 
+    static String camViewFront;
+    static String camViewSide;
+
+    static int ParkingLocationOfLabel;
+
+    // Initialize our Lists for configuration settings
+    static List<String> optionsInitialTilePosition; 
+    static List<String> optionsTrackable;
+    static List<String> optionsCamViewFront;
+    static List<String> optionsCamViewSide;
+    
+  //============================================================================
 
   @ExportToBlocks (
     heading = "Vision",
@@ -84,7 +139,6 @@ public class VisionAI extends BlocksOpModeCompanion  {
     // Camera handles to use
     camViewFront = constantWebcam2;
     camViewSide = constantWebcam1;
-    activeCamera = constantWebcam1;
     
     // Initialize our lists
     optionsInitialTilePosition = JavaUtil.createListWith();
@@ -119,39 +173,9 @@ public class VisionAI extends BlocksOpModeCompanion  {
     //Set information to display at next telemetry update
     telemetry.addData("camViewFront", camViewFront);
     telemetry.addData("camViewSide", camViewSide);
-    telemetry.addData("Active Camera", activeCamera);
     telemetry.addData("Current Tile Position", curTilePosition);
  
   } // end method initVisionAI()
- 
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Initialize Vuforia with switchable web cameras",
-    tooltip = "Initialize Vuforia with switchable web cameras"
-  )
-   /** Initialize Vuforia with switchable web cameras
-    */
-  static public void initVuforia() {
-      
-    // Initialize Vuforia using SwitchableCamera
-    vuforiaPOWERPLAY.initialize(
-        "", // vuforiaLicenseKey
-        VuforiaBase.getSwitchableCamera(hardwareMap), // cameraName
-        "", // webcamCalibrationFilename
-        false, // useExtendedTracking
-        true, // enableCameraMonitoring
-        VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES, // cameraMonitorFeedback
-        0, // dx
-        0, // dy
-        0, // dz
-        AxesOrder.XZY, // axesOrder
-        90, // firstAngle
-        90, // secondAngle
-        0, // thirdAngle
-        true); // useCompetitionFieldTargetLocations
-        
-  }  // end method initVuforia()
 
   @ExportToBlocks (
     heading = "Vision AI",
@@ -161,8 +185,9 @@ public class VisionAI extends BlocksOpModeCompanion  {
   )
    /** Activate Vuforia
     */
-  static public void activateVuforia(){
+  static public boolean activateVuforia(){
     vuforiaPOWERPLAY.activate();
+    return true;
   }  // end method activateVuforia() 
 
   @ExportToBlocks (
@@ -173,226 +198,10 @@ public class VisionAI extends BlocksOpModeCompanion  {
   )
    /** Deactivate Vuforia
     */
-  static public void deactivateVuforia(){
+  static public boolean deactivateVuforia(){
     vuforiaPOWERPLAY.deactivate();
+    return false;
   }  // end method deactivateVuforia() 
-
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Close Vuforia.",
-    tooltip = "Assumes Vuforia has been deactivated."
-  )
-   /** Close Vuforia
-    */
-  static public void closeVuforia(){
-    vuforiaPOWERPLAY.close();
-  }  // end method closeVuforia() 
-  
-
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Currently using for custom Parking Signal.",
-    tooltip = "Currently using for custom Parking Signal."
-  )
-   /** Initialize tensorflow based on the type of model we have trained.
-    */
-  static public void initTensorflow() {
-
-    // Set isModelTensorFlow2 to true if you used a TensorFlow 2 tool, such as ftc-ml, to create the model. 
-    // Set isModelQuantized to true if the model is quantized. Models created with ftc-ml are quantized. 
-    // Set inputSize to the image size corresponding to the model. 
-    //    If your model is based on SSD MobileNet v2 320x320, the image size is 300 (srsly!). 
-    //    If your model is based on SSD MobileNet V2 FPNLite 320x320, the image size is 320.
-    //    If your model is based on SSD MobileNet V1 FPN 640x640 or SSD MobileNet V2 FPNLite 640x640, the image size is 640.
-    
-    tfod.useModelFromFile("GBS_253_ssd_v2_fpnlite_320x320_metadata.tflite", labelsCustomTFModel, true, true, 320);
-    
-    // Set min confidence threshold to 0.7
-    tfod.initialize(vuforiaPOWERPLAY, (float) 0.7, true, true);
-    
-    // Enable following block to zoom in on target.
-    tfod.setZoom(1, 16 / 9);
-    
-  }  // end method initTensorflow()
-  
-  
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Activate Tensorflow.",
-    tooltip = "Assumes Tensorflow has been initialized."
-  )
-   /** Activate Tensorflow
-    */
-  static public void activateTensorflow(){
-    tfod.activate();
-  }  // end method activateTensorflow() 
-
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Deactivate Tensorflow.",
-    tooltip = "Assumes Tensorflow is active."
-  )
-   /** Deactivate Tensorflow
-    */
-  static public void deactivateTensorflow(){
-    tfod.deactivate();
-  }  // end method deactivateTensorflow() 
-
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Close Tensorflow.",
-    tooltip = "Assumes Tensorflow has been deactivated."
-  )
-   /** Close Tensorflow
-    */
-  static public void closeTensorflow(){
-    tfod.close();
-  }  // end method closeTensorflow() 
-    
-
-
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Sets an initial value for the active.",
-    tooltip = "Vuforia should have already been initialized."
-  )
-   /** Sets an initial value for the active camera.  
-    *  Includes setting the active camera for Vuforia.
-    */
-  static public void initCameraSwitching() {
-      
-    // active camera to side view camera
-    activeCamera = constantWebcam1;
-    
-    // After Vuforia is initialized, set the active camera
-    vuforiaPOWERPLAY.setActiveCamera(hardwareMap.get(WebcamName.class, constantWebcam1));
-    
-  }  // end method initCameraSwitching()
-
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Will set our cameras based on the configuration index provided.",
-    tooltip = "Index provided is base 1.",
-    parameterLabels = {"Configuration Index with Base 1"}
-  )
-   /** About to leave our Init stage and go into action
-    *  We need to set our cameras based on an assumed configuration when we started our Init
-    *  Assuming robot was in an X or B configuration and the grabber was towards the closest wall Trackable.
-    */
-  static public void initCamerasBasedOnConfiguration(int index) {
-    // NEED TO CONFIRM options in the configurations
-    
-    // TODO:  NEED TO SET CAMERAS BASED ON CONFIGURATION DISCOVERED
-    camViewFront = (((String) JavaUtil.inListGet(optionsCamViewFront, JavaUtil.AtMode.FROM_START, (index - 1), false)));
-    camViewSide = (((String) JavaUtil.inListGet(optionsCamViewSide, JavaUtil.AtMode.FROM_START, (index - 1), false)));
-    
-    // After Vuforia is initialized, set to our side view to track trackables
-    vuforiaPOWERPLAY.setActiveCamera(hardwareMap.get(WebcamName.class, camViewSide));
-    
-     // Set display information for the next telemetry update
-    telemetry.addData("initConfiguration: camViewFront", camViewFront);
-    telemetry.addData("initConfiguration: camViewSide", camViewSide);
- }  // end method initCamerasBasedOnConfiguration()
-
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Switches to the Front camera.",
-    tooltip = "The specific camera view depends on the robot orientation."
-  )
-    /** Switches to the Front camera.  
-    */
-  static public void switchToFrontView() {
-      
-    // Is the active camera already the side camera?
-    if (!activeCamera.equals(camViewFront)) {
-    
-      // If not the side camera then let's switch, but if in the Init of the OpMode our configuration hasn't been set yet
-      if (camViewFront.equals(constantWebcam1)) {
-        // Check and Set by the actual Webcam Name handles
-        vuforiaPOWERPLAY.setActiveCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-        activeCamera = constantWebcam1;
-      } else if (camViewFront.equals(constantWebcam2)) {
-        vuforiaPOWERPLAY.setActiveCamera(hardwareMap.get(WebcamName.class, "Webcam 2"));
-        activeCamera = constantWebcam2;
-      }
-    }
-    // Set display information for the next telemetry update
-    telemetry.addData("activeCamera", activeCamera);
-    telemetry.addData("camViewFront", camViewFront);
-  }  // end method switchToFrontView()
-
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Switches to the Side (back) camera.",
-    tooltip = "The specific camera view depends on the robot orientation."
-  )
-   /** Switches to the Side (back) camera.  
-    */
-  static public void switchToSideView() {
-      
-    // Is the active camera already the side camera?
-    if (!activeCamera.equals(camViewSide)) {
-    
-      // If not the side camera then let's switch, but if in the Init of the OpMode our configuration hasn't been set yet
-      if (camViewSide.equals(constantWebcam1)) {
-        // Check and Set by the actual Webcam Name handles
-        vuforiaPOWERPLAY.setActiveCamera(hardwareMap.get(WebcamName.class, constantWebcam1));
-        activeCamera = constantWebcam1;
-      } else if (camViewSide.equals(constantWebcam2)) {
-        vuforiaPOWERPLAY.setActiveCamera(hardwareMap.get(WebcamName.class, constantWebcam2));
-        activeCamera = constantWebcam2;
-      }
-    }
-    
-    // Set display information for the next telemetry update
-    telemetry.addData("activeCamera", activeCamera);
-    telemetry.addData("camViewSide", camViewSide);
-  }  // end method switchToSideView()
-
-  @ExportToBlocks (
-    heading = "Vision AI",
-    color = 32,
-    comment = "Switches between a Front and Side camera.",
-    tooltip = "The camera can only be switched every 5 seconds.  Assuming this is enough time for an image to be processed."
-  )
-   /** Switches between a Front and Side camera. 
-    *  The camera can only be switched every 5 seconds.  Set via the constant constantTimeBetweenCamerasMSec in the class
-    *  Assuming this is enough time for an image to be processed.
-    */
-  static public void switchCameraView() {
-      
-    // Check to see if we are trying to switch too often
-    if (timerSwitchCameras.milliseconds() < constantTimeBetweenCamerasMSec) {
-        // If requested switch too early than let's break out of the function
-        telemetry.addData("SwitchCameraView", "TIMER SAYS TOO EARLY TO SWITCH CAMERAS");
-        return;
-    }
-    
-    // If our currently active camera is the Front camera...
-    if (activeCamera.equals(camViewFront)) {
-        
-      // Switch to the side (back camera)
-      switchToSideView();
-      
-    } else {
-        
-      // Switch to the front camera
-      switchToFrontView();
-    }
-    
-    // Resetting our timer for another cycle
-    timerSwitchCameras.reset();
-    
-  }  // end method switchCameraView() 
 
   @ExportToBlocks (
     heading = "Vision AI",
@@ -496,179 +305,363 @@ public class VisionAI extends BlocksOpModeCompanion  {
     return isVisible;
   }  // end method isTargetVisible()
 
-  //@ExportToBlocks (
-  //  heading = "Parking Signal",
-  //  color = 32,
-  //  comment = "Looks through all the object recognitions and determine which parking location it correlates to, if any." +
-  //            "The parking location are for a default signal tensorflow model.",
-  //  tooltip = "Returns [1,2,3] or 0 if did not recognize any signals in the line of sight."
-  //)
-   /** Runs through all the object recognitions
-    *  Compares an object label from our known custom signal labels
-    *  Returns the Parking Location if Signal found.  Otherwise, returns 0.
-    */
-  static public int identifyParkingLocationFromDefaultSignal() {
-    String foundLabel;
-    int i;
-    Recognition recognition;
-    List<Recognition> recognitions;
-    int ParkingLocationOfLabel = 0;
+    @ExportToBlocks (
+      heading = "Trackables",
+      color = 32,
+      comment = "Activate tracking the Vuforia Trackable targets.",
+      tooltip = "Assumes Vuforia has been initialized."
+    )
+    /**
+     * Activate tracking the Vuforia Trackable targets
+     **/
+    static public boolean activateTrackables(){
 
-    // Get a static List of recognitions from TFOD.
-    recognitions = tfod.getRecognitions();
-    
-    // If static List is empty, inform the user. Otherwise, go
-    // through static List and display info for each recognition.
-    if (JavaUtil.listLength(recognitions) == 0) {
-      telemetry.addData("TFOD", "No items detected.");
-      i = 0;
-    } else {
-      i = 1;
-      
-      // Iterate through static List and call a function to
-      // display info for each recognized object.
-      for (Recognition recognition_item : recognitions) {
-        recognition = recognition_item;
-        foundLabel = recognition.getLabel();
-        ParkingLocationOfLabel = labelIndexFromDefaultPOWERPLAY(foundLabel);
-
-        // Display info on next telemetry update
-        displaySignalInfo(i, recognition);
-        
-        // Increment index.
-        i = i + 1;
+      if (targets != null) {
+        targets.activate();
+      } else {
+        return false;
       }
-    }
-    return ParkingLocationOfLabel;
-  }  // end method identifyParkingLocationFromDefaultSignal()
-
-  //@ExportToBlocks (
-  //  heading = "Parking Signal",
-  //  color = 32,
-  //  comment = "Given a label string it will determine whether it correlates to a parking location." +
-  //            "The parking location are for a default signal tensorflow model.",
-  //  tooltip = "The parking location returned is [1,2,3]." +
-  //            "If 0 is returned it did not find a correlated label to the string provided.",
-  //  parameterLabels = {"Found Label"}
-  //)
-   /** Compares an object label from our known custom signal labels
-    */
-  static public int labelIndexFromDefaultPOWERPLAY(String foundLabel)  {
-    
-    int ParkingLocationOfLabel = 0;
-    
-    telemetry.addData("Label Found", foundLabel);
-    if (foundLabel.equals(tfDefaultLabelParkingLocation1)) {
-      ParkingLocationOfLabel = 1;
-    } else if (foundLabel.equals(tfDefaultLabelParkingLocation2)) {
-      ParkingLocationOfLabel = 2;
-    } else if (foundLabel.equals(tfDefaultLabelParkingLocation3)) {
-      ParkingLocationOfLabel = 3;
-    }
-    return ParkingLocationOfLabel;
-  }  // end method labelIndexFromDefaultPOWERPLAY()
-
-
-  //@ExportToBlocks (
-  //  heading = "Parking Signal",
-  //  color = 32,
-  //  comment = "Looks through all the object recognitions and determine which parking location it correlates to, if any." +
-  //            "The parking location are for a custom signal tensorflow model.",
-  //  tooltip = "Returne [1,2,3] or 0 if did not recognize any signals in the line of sight."
-  //)
-   /** Runs through all the object recognitions
-    *  Compares an object label from our known custom signal labels
-    *  Returns the Parking Location if Signal found.  Otherwise, returns 0.
-    */
-  static public int identifyParkingLocationFromCustomSignal() {
-    String foundLabel;
-    int i;
-    Recognition recognition;
-    List<Recognition> recognitions;
-    int ParkingLocationOfLabel = 0;
-
-    // Get a static List of recognitions from TFOD.
-    recognitions = tfod.getRecognitions();
-    
-    // If static List is empty, inform the user. Otherwise, go
-    // through static List and display info for each recognition.
-    if (JavaUtil.listLength(recognitions) == 0) {
-      telemetry.addData("TFOD", "No items detected.");
-      i = 0;
-    } else {
-      i = 1;
       
-      // Iterate through static List and call a function to
-      // display info for each recognized object.
-      for (Recognition recognition_item : recognitions) {
-        recognition = recognition_item;
-        foundLabel = recognition.getLabel();
-        ParkingLocationOfLabel = labelIndexFromCustomSignal(foundLabel);
-        
-        // Display info during the next telemetry update
-        displaySignalInfo(i, recognition);
-        
-        // Increment index.
-        i = i + 1;
+      return true;
+
+    }  // end method activateTrackables() 
+
+
+    @ExportToBlocks (
+      heading = "Trackables",
+      color = 32,
+      comment = "Deactivate tracking of Vuforia Trackable targets.",
+      tooltip = "Assumes Vuforia is tracking."
+    )
+    /**
+     * Deactivate tracking the Vuforia Trackable targets
+     **/
+    static public boolean deactivateTrackables(){
+
+      if (targets != null) {
+        targets.deactivate();
+      } else {
+        return false;
       }
-    }
-    return ParkingLocationOfLabel;
-  }  // end method identifyParkingLocationFromCustomSignal()
+      
+      return false;
 
-  //@ExportToBlocks (
-  //  heading = "Parking Signal",
-  //  color = 32,
-  //  comment = "Given a label string it will determine whether it correlates to a parking location." +
-  //            "The parking location are for a custom signal tensorflow model.",
-  //  tooltip = "The parking location returned is [1,2,3]." +
-  //            "If 0 is returned it did not find a correlated label to the string provided.",
-  //  parameterLabels = {"Found Label"}
-  //)
-   /** Compares an object label from our known custom signal labels
-    */
-  static public int labelIndexFromCustomSignal(String foundLabel) {
-    int ParkingLocationOfLabel = 0;
+    }  // end method deactivateTrackables() 
     
-    telemetry.addData("Label Found", foundLabel);
-    if (foundLabel.equals(tfCustomLabelParkingLocation1)) {
-      ParkingLocationOfLabel = 1;
-    } else if (foundLabel.equals(tfCustomLabelParkingLocation2)) {
-      ParkingLocationOfLabel = 2;
-    } else if (foundLabel.equals(tfCustomLabelParkingLocation3)) {
-      ParkingLocationOfLabel = 3;
+
+    @ExportToBlocks (
+      heading = "Trackables",
+      color = 32,
+      comment = "Detect targets visible.",
+      tooltip = "Assumes tracking has been activated."
+    )
+    /**
+     * Detects Vuforia Trackable targets
+     **/
+    static public boolean isTrackableVisible(){
+        // check all the trackable targets to see which one (if any) is visible.
+        targetVisible = false;
+        
+        for (VuforiaTrackable trackable : allTrackables) {
+            if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
+                telemetry.addData("Visible Target", trackable.getName());
+                targetVisible = true;
+
+                // getUpdatedRobotLocation() will return null if no new information is available since
+                // the last time that call was made, or if the trackable is not currently visible.
+                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
+                if (robotLocationTransform != null) {
+                    lastLocation = robotLocationTransform;
+                }
+                break;
+            }
+        }
+
+        // Provide feedback as to where the robot is located (if we know).
+        if (targetVisible) {
+            // express position (translation) of robot in inches.
+            VectorF translation = lastLocation.getTranslation();
+            telemetry.addData("Pos (inches)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+
+            // express the rotation of the robot in degrees.
+            Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+            telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+        } else {
+            telemetry.addData("Visible Target", "none");
+        }
+        
+        telemetry.update();
+        
+        return targetVisible;
+        
+    }  // end method targetVisible() 
+
+
+    /***
+     * Identify a target by naming it, and setting its position and orientation on the field
+     * @param targetIndex
+     * @param targetName
+     * @param dx, dy, dz  Target offsets in x,y,z axes
+     * @param rx, ry, rz  Target rotations in x,y,z axes
+     */
+    static void identifyTarget(int targetIndex, String targetName, float dx, float dy, float dz, float rx, float ry, float rz) {
+        VuforiaTrackable aTarget = targets.get(targetIndex);        
+
+        aTarget.setName(targetName);
+        aTarget.setLocation(OpenGLMatrix.translation(dx, dy, dz)
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, rx, ry, rz)));
+
     }
-    return ParkingLocationOfLabel;
-  }  // end method labelIndexFromCustomSignal()
 
- 
-  @ExportToBlocks (
-    heading = "Parking Signal",
-    color = 32,
-    comment = "Adds information to telemetry to be displayed.",
-    tooltip = "A telemetry update will need to be called to display this information from the queue.",
-    parameterLabels = {"Index of Object Recognized", "Recognition to Display"}
-  )  // end method 
-   /**  Gets the detail information about the object recognized in list of with index i
-    *   Adds the detail information into telemetry to be displayed on driver station
-    */
-  static public void displaySignalInfo(int i, Recognition recognition) {
+    @ExportToBlocks (
+      heading = "Vision AI",
+      color = 32,
+      comment = "Activate Tensorflow.",
+      tooltip = "Assumes Tensorflow has been initialized."
+    )
+    /**
+     * Activate TensorFlow Object Detection before we wait for the start command.
+     * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+     **/
+    static public boolean activateTensorflow(){
 
-    // Make sure this section is visible and separateed on the driver station with an all CAPS header
-    telemetry.addData("OBJECT DETECTED","Displaying Information");
+      if (tfod != null) {
+        tfod.activate();
+
+        // The TensorFlow software will scale the input images from the camera to a lower resolution.
+        // This can result in lower detection accuracy at longer distances (> 55cm or 22").
+        // If your target is at distance greater than 50 cm (20") you can increase the magnification value
+        // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
+        // should be set to the value of the images used to create the TensorFlow Object Detection model
+        // (typically 16/9).
+        tfod.setZoom(1.0, 16.0/9.0);
+      } else {
+        return false;
+      }
+      
+      return true;
+
+    }  // end method activateTensorflow() 
+
+    @ExportToBlocks (
+      heading = "Parking Signal",
+      color = 32,
+      comment = "Looks through all the object recognitions and determine which parking location it correlates to, if any." +
+                "The parking location are for a custom signal tensorflow model.",
+       tooltip = "Returns [1,2,3] or 0 if did not recognize any signals in the line of sight."
+    )
+    /** Runs through all the object recognitions
+     *  Compares an object label from our known custom signal labels
+     *  Returns the Parking Location if Signal found.  Otherwise, returns 0.
+     */
+    static public String identifyParkingLocationFromCustomSignal() {
+        String parkingLocation = "";
+        
+        if (tfod != null) {
+            doCameraSwitching();  // Detects left or right bumpers to switch cameras
+            List<Recognition> recognitions = tfod.getRecognitions();
+            telemetry.addData("# Objects Detected", recognitions.size());
+            
+            // step through the list of recognitions and display image size and position
+            // Note: "Image number" refers to the randomized image orientation/number
+            for (Recognition recognition : recognitions) {
+                double col = (recognition.getLeft() + recognition.getRight()) / 2 ;
+                double row = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+                double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
+                double height = Math.abs(recognition.getTop()  - recognition.getBottom()) ;
+
+                parkingLocation = recognition.getLabel();
+                
+                telemetry.addData(""," ");
+                telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
+                telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
+                telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
+            }
+
+        } 
+        
+        return parkingLocation;
+        
+    }  // end method identifyParkingLocationFromCustomSignal()
+
+
+    @ExportToBlocks (
+      heading = "Vision AI",
+      color = 32,
+      comment = "Initialize Vuforia with switchable web cameras",
+      tooltip = "Initialize Vuforia with switchable web cameras"
+    )
+    /**
+     * Initialize the Vuforia localization engine with switchable web cameras
+     */
+    static public void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         * We can pass Vuforia the handle to a camera preview resource (on the RC screen);
+         * If no camera-preview is desired, use the parameter-less constructor instead (commented out below).
+         * Note: A preview window is required if you want to view the camera stream on the Driver Station Phone.
+         */
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        vuforiaPOWERPLAY = new VuforiaCurrentGame();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+
+        // Indicate that we wish to be able to switch cameras.
+        webcam1 = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
+        parameters.cameraName = ClassFactory.getInstance().getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
+
+        // Turn off Extended tracking.  Set this true if you want Vuforia to track beyond the target.
+        parameters.useExtendedTracking = false;
+
+        // Initialize Vuforia using SwitchableCamera
+        vuforiaPOWERPLAY.initialize(
+        parameters.vuforiaLicenseKey, // vuforiaLicenseKey
+        parameters.cameraName, // cameraName
+        "", // webcamCalibrationFilename
+        parameters.useExtendedTracking, // useExtendedTracking
+        true, // enableCameraMonitoring
+        VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES, // cameraMonitorFeedback
+        0, // dx
+        0, // dy
+        0, // dz
+        AxesOrder.XZY, // axesOrder
+        90, // firstAngle
+        90, // secondAngle
+        0, // thirdAngle
+        true); // useCompetitionFieldTargetLocations
+        
+        vuforia = vuforiaPOWERPLAY.getVuforiaLocalizer();
+
+        // Set the active camera to Webcam 1.
+        switchableCamera = (SwitchableCamera) vuforiaPOWERPLAY.getVuforiaLocalizer().getCamera();
+        switchableCamera.setActiveCamera(webcam1);
+        
+        // Load the data sets for the trackable objects. These particular data
+        // sets are stored in the 'assets' part of our application.
+        targets = (VuforiaTrackables) vuforiaPOWERPLAY.getVuforiaLocalizer().loadTrackablesFromAsset("PowerPlay");
+        
+        // For convenience, gather together all the trackable objects in one easily-iterable collection */
+        List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
+        allTrackables.addAll(targets);
+
+        /**
+         * In order for localization to work, we need to tell the system where each target is on the field, and
+         * where the phone resides on the robot.  These specifications are in the form of <em>transformation matrices.</em>
+         * Transformation matrices are a central, important concept in the math here involved in localization.
+         * See <a href="https://en.wikipedia.org/wiki/Transformation_matrix">Transformation Matrix</a>
+         * for detailed information. Commonly, you'll encounter transformation matrices as instances
+         * of the {@link OpenGLMatrix} class.
+         *
+         * If you are standing in the Red Alliance Station looking towards the center of the field,
+         *     - The X axis runs from your left to the right. (positive from the center to the right)
+         *     - The Y axis runs from the Red Alliance Station towards the other side of the field
+         *       where the Blue Alliance Station is. (Positive is from the center, towards the BlueAlliance station)
+         *     - The Z axis runs from the floor, upwards towards the ceiling.  (Positive is above the floor)
+         *
+         * Before being transformed, each target image is conceptually located at the origin of the field's
+         *  coordinate system (the center of the field), facing up.
+         */
+
+        // Name and locate each trackable object
+        identifyTarget(0, "Red Audience Wall",   -halfField,  -oneAndHalfTile, mmTargetHeight, 90, 0,  90);
+        identifyTarget(1, "Red Rear Wall",        halfField,  -oneAndHalfTile, mmTargetHeight, 90, 0, -90);
+        identifyTarget(2, "Blue Audience Wall",  -halfField,   oneAndHalfTile, mmTargetHeight, 90, 0,  90);
+        identifyTarget(3, "Blue Rear Wall",       halfField,   oneAndHalfTile, mmTargetHeight, 90, 0, -90);
+
+        /*
+         * Create a transformation matrix describing where the camera is on the robot.
+         *
+         * Info:  The coordinate frame for the robot looks the same as the field.
+         * The robot's "forward" direction is facing out along X axis, with the LEFT side facing out along the Y axis.
+         * Z is UP on the robot.  This equates to a bearing angle of Zero degrees.
+         *
+         * For a WebCam, the default starting orientation of the camera is looking UP (pointing in the Z direction),
+         * with the wide (horizontal) axis of the camera aligned with the X axis, and
+         * the Narrow (vertical) axis of the camera aligned with the Y axis
+         *
+         * But, this example assumes that the camera is actually facing forward out the front of the robot.
+         * So, the "default" camera position requires two rotations to get it oriented correctly.
+         * 1) First it must be rotated +90 degrees around the X axis to get it horizontal (its now facing out the right side of the robot)
+         * 2) Next it must be be rotated +90 degrees (counter-clockwise) around the Z axis to face forward.
+         *
+         * Finally the camera can be translated to its actual mounting position on the robot.
+         *      In this example, it is centered on the robot (left-to-right and front-to-back), and 6 inches above ground level.
+         */
+
+        final float CAMERA_FORWARD_DISPLACEMENT  = 0.0f * mmPerInch;   // eg: Enter the forward distance from the center of the robot to the camera lens
+        final float CAMERA_VERTICAL_DISPLACEMENT = 6.0f * mmPerInch;   // eg: Camera is 6 Inches above ground
+        final float CAMERA_LEFT_DISPLACEMENT     = 0.0f * mmPerInch;   // eg: Enter the left distance from the center of the robot to the camera lens
+
+        OpenGLMatrix cameraLocationOnRobot = OpenGLMatrix
+                    .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XZY, DEGREES, 90, 90, 0));
+
+        /**  Let all the trackable listeners know where the camera is.  */
+        for (VuforiaTrackable trackable : allTrackables) {
+            ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(parameters.cameraName, cameraLocationOnRobot);
+        }
+        
+    }  // end method initVuforia()
+
+    @ExportToBlocks (
+      heading = "Vision AI",
+      color = 32,
+      comment = "Currently using for custom Parking Signal.",
+      tooltip = "Currently using for custom Parking Signal."
+    )
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    static public void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+            "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.inputSize = 300;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+
+        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
+        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
+        //tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+    }  // end method initTfod()
+
+    @ExportToBlocks (
+      heading = "Vision AI",
+      color = 32,
+      comment = "Switches between a Front and Side camera.",
+      tooltip = "Uses bumpers to switch the cameras."
+    )
+    /** Switches between a Front and Side camera. 
+     */
+    static public void doCameraSwitching() {
+        // If the left bumper is pressed, use Webcam 1.
+        // If the right bumper is pressed, use Webcam 2.
+        boolean newLeftBumper = gamepad1.left_bumper;
+        boolean newRightBumper = gamepad1.right_bumper;
+        if (newLeftBumper && !oldLeftBumper) {
+            switchableCamera.setActiveCamera(webcam1);
+        } else if (newRightBumper && !oldRightBumper) {
+            switchableCamera.setActiveCamera(webcam2);
+        }
+        oldLeftBumper = newLeftBumper;
+        oldRightBumper = newRightBumper;
+
+        if (switchableCamera.getActiveCamera().equals(webcam1)) {
+            telemetry.addData("activeCamera", "Webcam 1");
+            telemetry.addData("Press RightBumper", "to switch to Webcam 2");
+        } else {
+            telemetry.addData("activeCamera", "Webcam 2");
+            telemetry.addData("Press LeftBumper", "to switch to Webcam 1");
+        }
+    }  // end method doCameraSwitching()
     
-    // Display label info.
-    // Display the label and index number for the recognition.
-    telemetry.addData("label " + i, recognition.getLabel());
+}  // end class VisionAI
 
-    // Display upper corner info.
-    // Display the location of the top left corner
-    // of the detection boundary for the recognition
-    telemetry.addData("Left, Top " + i, Double.parseDouble(JavaUtil.formatNumber(recognition.getLeft(), 0)) + ", " + Double.parseDouble(JavaUtil.formatNumber(recognition.getTop(), 0)));
- 
-    // Display lower corner info.
-    // Display the location of the bottom right corner
-    // of the detection boundary for the recognition
-    telemetry.addData("Right, Bottom " + i, Double.parseDouble(JavaUtil.formatNumber(recognition.getRight(), 0)) + ", " + Double.parseDouble(JavaUtil.formatNumber(recognition.getBottom(), 0)));
-  }  // end method displaySignalInfo()
 
-}
