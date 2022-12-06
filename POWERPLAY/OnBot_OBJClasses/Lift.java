@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.JavaUtil;
 public class Lift extends BlocksOpModeCompanion {
 
   static AnalogInput liftVoltage;
-  static Servo lift;
+  static Servo servoLift;
 
   // Java class variables for detecting & controlling lift range
   static double voltageLowest = 0.45;  // 0.45  // static variables defined across java class
@@ -19,16 +19,16 @@ public class Lift extends BlocksOpModeCompanion {
   
   // Initialize our junction lift levels
   // liftDropLevel: Range voltageLowest - voltageHighest
-  static double[] liftJunctionLevel = {0.45, 0.84, 1.14};  // {0.45, 0.84, 1.14}
+  static double[] liftJunctionLevel = {0.455, 0.84, 1.189};  // {0.45, 0.84, 1.14}
 
   // Initialize our pickup lift levels
   // Range voltageLowest - voltageHighest
-  static double[] liftPickupLevel = {0.43, 0.47, 0.52, 0.55, 0.58};  // {0.43, 0.47, 0.52, 0.55, 0.58}
+  static double[] liftPickupLevel = {0.455, 0.50, 0.56};  // {0.43, 0.47, 0.52, 0.55, 0.58}
 
   // Determines whether the lift is in an event driven mode of moving to a target
   static boolean liftMovingToTarget = false;
   static double targetLevel = voltageLowest;  //  Target level by holding button
-  static double targetThreshold = 0.02;
+  static double targetThreshold = 0.035;
   
   // Will be current reading for our analog sensor associated with lift
   // ***Values will vary if the cord and springs are stretched***
@@ -61,7 +61,7 @@ public class Lift extends BlocksOpModeCompanion {
 
     // initialize our handles on hardware parts of our lift
     // String names provided to this function should be the same as those in active hardware configuration
-    lift = hardwareMap.get(Servo.class, liftMotorName);
+    servoLift = hardwareMap.get(Servo.class, liftMotorName);
     liftVoltage = hardwareMap.get(AnalogInput.class, liftAnalogSensorName);
  
     telemetry.addData("Lowest voltage", Double.parseDouble(JavaUtil.formatNumber(voltageLowest, 2)));
@@ -93,9 +93,7 @@ public class Lift extends BlocksOpModeCompanion {
 
     telemetry.addData("Lift Power for NO Movement:", liftPowerScaledNoMovement);
     
-    lift.setPosition(liftPowerScaledNoMovement);
-    
-    telemetry.addData("Lift Action:", "Setting No Movement");
+    servoLift.setPosition(liftPowerScaledNoMovement);
 
     return currentVoltage;
     
@@ -154,7 +152,7 @@ public class Lift extends BlocksOpModeCompanion {
   @ExportToBlocks (
     heading = "Move To Level Specified",
     color = 255,
-    comment = "Move to level specified by button selected[Start,A,B,Y,Z] and whether grabber is closed.",
+    comment = "Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed.",
     tooltip = "Move to a level. Send -1 to check status if ready to stop.",
     parameterLabels = {"Level Request", "Is Grabber Closed"}
   )
@@ -234,7 +232,7 @@ public class Lift extends BlocksOpModeCompanion {
       if (currentVoltage < voltageHighest && targetLevel > currentVoltage) {
 
         // Initiate moving up to target
-        lift.setPosition(liftPowerScaledMoveUp);
+        servoLift.setPosition(liftPowerScaledMoveUp);
         
         currentVoltage = liftVoltage.getVoltage();
         telemetry.addData("Lift Target Level: ", targetLevel);
@@ -254,7 +252,7 @@ public class Lift extends BlocksOpModeCompanion {
       if (currentVoltage > voltageLowest && targetLevel < currentVoltage) {
 
         // Initiate moving down to target
-        lift.setPosition(liftPowerScaledMoveDown);
+        servoLift.setPosition(liftPowerScaledMoveDown);
         
         currentVoltage = liftVoltage.getVoltage();
         telemetry.addData("Lift Target Level: ", targetLevel);
@@ -377,7 +375,7 @@ public class Lift extends BlocksOpModeCompanion {
       
     // Move up until able to reach our targetDropLevel or Highest limit
     while (currentVoltage < voltageHighest && targetLevel > currentVoltage) {
-      lift.setPosition(liftPowerScaledMoveUp);
+      servoLift.setPosition(liftPowerScaledMoveUp);
       currentVoltage = liftVoltage.getVoltage();
       telemetry.addData("Lift Target Junction Level: ", targetLevel);
       telemetry.addData("Lift Current Voltage: ", currentVoltage);
@@ -424,7 +422,7 @@ public class Lift extends BlocksOpModeCompanion {
       
     // Move down until able to reach our targetJunctionLevel or lowest limit
     while (currentVoltage > voltageLowest && targetLevel < currentVoltage) {
-      lift.setPosition(liftPowerScaledMoveDown);
+      servoLift.setPosition(liftPowerScaledMoveDown);
       currentVoltage = liftVoltage.getVoltage();
       telemetry.addData("Lift Target Level: ", targetLevel);
       telemetry.addData("Lift Current Voltage: ", currentVoltage);
@@ -451,16 +449,15 @@ public class Lift extends BlocksOpModeCompanion {
     liftMovingToTarget = false;
     
     // Set information to be displayed
-    telemetry.addData("Lift Power for Moving Up: ", liftPowerScaledMoveUp);
     telemetry.addData("Lift Highest Limit: ", voltageHighest);
     
     // Get our lastest voltage (aka lift position)
     targetLevel = currentVoltage = liftVoltage.getVoltage();
 
     if (currentVoltage <= voltageHighest) {
-      lift.setPosition(liftPowerScaledMoveUp);
+      servoLift.setPosition(liftPowerScaledMoveUp);
       currentVoltage = liftVoltage.getVoltage();
-      telemetry.addData("Lift Action:", "Moving Up");
+
     } else {
       currentVoltage = stopLiftMovement();
     }
@@ -489,7 +486,7 @@ public class Lift extends BlocksOpModeCompanion {
     targetLevel = currentVoltage = liftVoltage.getVoltage();
 
     if (currentVoltage >= voltageLowest) {
-      lift.setPosition(liftPowerScaledMoveDown);
+      servoLift.setPosition(liftPowerScaledMoveDown);
       currentVoltage = liftVoltage.getVoltage();
       telemetry.addData("Lift Action:", "Moving Down");
     } else {
@@ -508,7 +505,7 @@ public class Lift extends BlocksOpModeCompanion {
    * Sets telemetry to display for lift
    */
   public static void setToDisplayLiftInfo() {
-    telemetry.addData("Lift Power:", lift.getPosition());
+    telemetry.addData("Lift Power:", servoLift.getPosition());
     telemetry.addData("Lift Voltage:", currentVoltage);
   }  // end method setToDisplayLiftInfo()
   

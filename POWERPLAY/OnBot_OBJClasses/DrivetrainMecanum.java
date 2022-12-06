@@ -23,8 +23,9 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     
     // Initialize our speed levels
     // powerLevel: Range 0-1.00
-    static double[] powerLevel = {0.25, 0.35, 0.50, 0.75};
+    static double[] powerLevel = {0.25, 0.50};
     static double powerThreshold = 0.20;
+    static double turningPowerLevel = 0.25;
 
     // Initialize our current power / speed to zero
     static int indexPowerLevel = 0;
@@ -512,16 +513,16 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
      */
     public static boolean turnClockwise() {
 
-         if (getPowerLevel() >= powerThreshold) {
+         if (turningPowerLevel >= powerThreshold) {
              
             // Setting power to wheels on same side
             // Setting first set of same-side wheels to positive
-            driveLeftFront.setPower(powerAbsolute);
-            driveLeftBack.setPower(powerAbsolute);
+            driveLeftFront.setPower(turningPowerLevel);
+            driveLeftBack.setPower(turningPowerLevel);
             
             // Setting second set of opposing wheels to negative
-            driveRightFront.setPower(-powerAbsolute);
-            driveRightBack.setPower(-powerAbsolute);
+            driveRightFront.setPower(-turningPowerLevel);
+            driveRightBack.setPower(-turningPowerLevel);
             
             moving = true;
             telemetry.addData("Movement", "Turning CLOCKWISE");
@@ -547,14 +548,17 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
      */
     public static boolean turnCounterClockwise() {
 
-         if (getPowerLevel() >= powerThreshold) {
+         if (turningPowerLevel >= powerThreshold) {
+             
               // Setting power to wheels on same side
               // Setting first set of same-side wheels to positive
-              driveLeftFront.setPower(-powerAbsolute);
-              driveLeftBack.setPower(-powerAbsolute);
+              driveLeftFront.setPower(-turningPowerLevel);
+              driveLeftBack.setPower(-turningPowerLevel);
+              
               // Setting second set of opposing wheels to negative
-              driveRightFront.setPower(powerAbsolute);
-              driveRightBack.setPower(powerAbsolute);
+              driveRightFront.setPower(turningPowerLevel);
+              driveRightBack.setPower(turningPowerLevel);
+              
               moving = true;
               telemetry.addData("Movement", "Turning COUNTERCLOCKWISE");
          } else {

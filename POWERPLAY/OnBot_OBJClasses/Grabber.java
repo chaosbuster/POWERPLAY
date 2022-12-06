@@ -13,7 +13,7 @@ public class Grabber extends BlocksOpModeCompanion {
   static double scaledPositionRelease;    // Calculated in the init
 
   @ExportToBlocks (
-    heading = "Initialize Grabber",
+    heading = "Grabber",
     color = 255,
     comment = "Initialize variables for our grabber.",
     tooltip = "Initialize variables for our grabber.",
@@ -35,7 +35,7 @@ public class Grabber extends BlocksOpModeCompanion {
       double positionGrabberGoodGrip = 154;
       double positionGrabberTouchSides = 185;
       double positionGrabberClearSides = 182;
-      double positionGrabberRelease = 170;
+      double positionGrabberRelease = 165;  // Originally 170
     
       // The two key servo positions that will be used 
       scaledPositionGrab = (positionGrabberGoodGrip - positionGrabberMinScale) / (positionGrabberMaxScale - positionGrabberMinScale);
@@ -47,7 +47,7 @@ public class Grabber extends BlocksOpModeCompanion {
   }
 
   @ExportToBlocks (
-    heading = "Is Grabber Closed",
+    heading = "Grabber",
     color = 255,
     comment = "Returns whether the grabber is closed.",
     tooltip = "Returns a TRUE if grabber is closed."
@@ -69,7 +69,7 @@ public class Grabber extends BlocksOpModeCompanion {
   }  // end method isGrabberClosed()
 
   @ExportToBlocks (
-    heading = "Close Grabber",
+    heading = "Grabber",
     color = 255,
     comment = "Action to close grabber and grab.",
     tooltip = "Action to close grabber and grab."
@@ -79,10 +79,14 @@ public class Grabber extends BlocksOpModeCompanion {
    */
   public static void closeGrabber() {
     servoGrabber.setPosition(scaledPositionGrab);
+    
+    // Once we have grabbed a cone the lift will go to a low junction level
+    //Lift.moveToLevelSpecified(1, true);
+    
   }  // end method closeGrabber()
 
   @ExportToBlocks (
-    heading = "Open Grabber",
+    heading = "Grabber",
     color = 255,
     comment = "Action to open grabber and release.",
     tooltip = "Action to open grabber and release."
