@@ -209,18 +209,23 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
         driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
-        turnToHeading( TURN_SPEED, -45.0);               // Turn  CW to -45 Degrees
-        holdHeading( TURN_SPEED, -45.0, 0.5);   // Hold -45 Deg heading for a 1/2 second
+        driveLeft (DRIVE_SPEED / 16.0, 18.0, -90.0);       // Drive Left 12"
+        driveStraight(DRIVE_SPEED, -24.0, 0.0);    // Drive Reverse 24"
+        driveLeft (DRIVE_SPEED / 16.0, -18.0, 90.0);       // Drive Right 12"
+        
+        //driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"        
+        //turnToHeading( TURN_SPEED, -45.0);               // Turn  CW to -45 Degrees
+        //holdHeading( TURN_SPEED, -45.0, 0.5);   // Hold -45 Deg heading for a 1/2 second
 
-        driveStraight(DRIVE_SPEED, 17.0, -45.0);  // Drive Forward 17" at -45 degrees (12"x and 12"y)
-        turnToHeading( TURN_SPEED,  45.0);               // Turn  CCW  to  45 Degrees
-        holdHeading( TURN_SPEED,  45.0, 0.5);    // Hold  45 Deg heading for a 1/2 second
+        //driveStraight(DRIVE_SPEED, 17.0, -45.0);  // Drive Forward 17" at -45 degrees (12"x and 12"y)
+        //turnToHeading( TURN_SPEED,  45.0);               // Turn  CCW  to  45 Degrees
+        //holdHeading( TURN_SPEED,  45.0, 0.5);    // Hold  45 Deg heading for a 1/2 second
 
-        driveStraight(DRIVE_SPEED, 17.0, 45.0);  // Drive Forward 17" at 45 degrees (-12"x and 12"y)
-        turnToHeading( TURN_SPEED,   0.0);               // Turn  CW  to 0 Degrees
-        holdHeading( TURN_SPEED,   0.0, 1.0);    // Hold  0 Deg heading for 1 second
+        //driveStraight(DRIVE_SPEED, 17.0, 45.0);  // Drive Forward 17" at 45 degrees (-12"x and 12"y)
+        //turnToHeading( TURN_SPEED,   0.0);               // Turn  CW  to 0 Degrees
+        //holdHeading( TURN_SPEED,   0.0, 1.0);    // Hold  0 Deg heading for 1 second
 
-        driveStraight(DRIVE_SPEED,-48.0, 0.0);    // Drive in Reverse 48" (should return to approx. staring position)
+        //driveStraight(DRIVE_SPEED,-48.0, 0.0);    // Drive in Reverse 48" (should return to approx. staring position)
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -295,6 +300,93 @@ public class TestAutoDriveByGyro extends LinearOpMode {
 
                 // Apply the turning correction to the current driving speed.
                 moveRobot(driveSpeed, turnSpeed);
+
+                // Display drive status for the driver.
+                sendTelemetry(true);
+            }
+
+            // Stop all motion & Turn off RUN_TO_POSITION
+            moveRobot(0, 0);
+            driveLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            driveRightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            
+            driveRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            driveLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
+    /**
+    *  Method to drive in a straight line, on a fixed compass heading (angle), based on encoder counts.
+    *  Move will stop if either of these conditions occur:
+    *  1) Move gets to the desired position
+    *  2) Driver stops the opmode running.
+    *
+    * @param maxDriveSpeed MAX Speed for forward/rev motion (range 0 to +1.0) .
+    * @param distance   Distance (in inches) to move from current position.  Negative distance means move backward.
+    * @param heading      Absolute Heading Angle (in Degrees) relative to last gyro reset.
+    *                   0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
+    *                   If a relative angle is required, add/subtract from the current robotHeading.
+    */
+    //  ADDED FOR MECANUM By Coach Breton
+    public void driveLeft(double maxDriveSpeed,
+                              double distance,
+                              double heading) {
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            int moveCounts = (int)(Math.abs(distance) * COUNTS_PER_INCH);
+            
+            if (distance > 0) {
+              targetLeftFront = driveLeftFront.getCurrentPosition() - moveCounts;
+              targetRightBack = driveRightBack.getCurrentPosition() - moveCounts;
+            
+              targetRightFront = driveRightFront.getCurrentPosition() + moveCounts;
+              targetLeftBack = driveLeftBack.getCurrentPosition() + moveCounts;
+              
+            } else {
+                
+              targetLeftFront = driveLeftFront.getCurrentPosition() + moveCounts;
+              targetRightBack = driveRightBack.getCurrentPosition() + moveCounts;
+            
+              targetRightFront = driveRightFront.getCurrentPosition() - moveCounts;
+              targetLeftBack = driveLeftBack.getCurrentPosition() - moveCounts;
+               
+            }
+
+            // Set Target FIRST, then turn on RUN_TO_POSITION
+            driveLeftFront.setTargetPosition(targetLeftFront);
+            driveRightBack.setTargetPosition(targetRightBack);
+
+            driveRightFront.setTargetPosition(targetRightFront);
+            driveLeftBack.setTargetPosition(targetLeftBack);
+
+            // Now RUN_TO_POSITION
+            driveLeftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            driveRightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            
+            driveRightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            driveLeftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // Set the required driving speed  (must be positive for RUN_TO_POSITION)
+            // Start driving straight, and then enter the control loop
+            maxDriveSpeed = Math.abs(maxDriveSpeed);
+            moveLeft(maxDriveSpeed, 0);
+
+            // keep looping while we are still active, and BOTH motors are running.
+            while (opModeIsActive() &&
+                   (driveLeftFront.isBusy() && driveRightBack.isBusy() && driveRightFront.isBusy() && driveLeftBack.isBusy())) {
+
+                // Determine required steering to keep on heading
+                turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
+
+                // if driving in reverse, the motor correction also needs to be reversed
+                if (distance < 0)
+                    turnSpeed *= -1.0;
+
+                // Apply the turning correction to the current driving speed.
+                moveLeft(driveSpeed, turnSpeed);
 
                 // Display drive status for the driver.
                 sendTelemetry(true);
@@ -447,6 +539,42 @@ public class TestAutoDriveByGyro extends LinearOpMode {
      * @param drive forward motor speed
      * @param turn  clockwise turning motor speed.
      */
+    //  ADDED FOR MECANUM By Coach Breton
+    public void moveLeft(double drive, double turn) {
+        driveSpeed = drive;     // save this value as a class member so it can be used by telemetry.
+        turnSpeed  = turn;      // save this value as a class member so it can be used by telemetry.
+
+        speedLeftFront  = drive - turn;
+        speedRightBack  = drive - turn;
+
+        speedRightFront = drive + turn;
+        speedLeftBack = drive + turn;
+
+        // Scale speeds down if either one exceeds +/- 1.0;
+        double max = Math.max(Math.max(Math.abs(speedLeftFront), Math.abs(speedRightBack)), Math.max(Math.abs(speedRightFront), Math.abs(speedLeftBack)));
+        if (max > 1.0)
+        {
+            speedLeftFront /= max;
+            speedRightBack /= max;
+            
+            speedRightFront /= max;
+            speedLeftBack /= max;
+        }
+
+        driveLeftFront.setPower(speedLeftFront);
+        driveRightBack.setPower(speedRightBack);
+
+        driveRightFront.setPower(speedRightFront);
+        driveLeftBack.setPower(speedLeftBack);
+    }
+
+    /**
+     * This method takes separate drive (fwd/rev) and turn (right/left) requests,
+     * combines them, and applies the appropriate speed commands to the left and right wheel motors.
+     * @param drive forward motor speed
+     * @param turn  clockwise turning motor speed.
+     */
+    //  ADDED FOR MECANUM By Coach Breton
     public void turnRobot(double drive, double turn) {
         driveSpeed = drive;     // save this value as a class member so it can be used by telemetry.
         turnSpeed  = turn;      // save this value as a class member so it can be used by telemetry.

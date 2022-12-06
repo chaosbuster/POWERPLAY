@@ -1,6 +1,8 @@
 <xml xmlns="https://developers.google.com/blockly/xml">
 <variables>
 <variable id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</variable>
+<variable id="W+[-0JTv*bj3)Hs1i)nW">distanceToPickupCone</variable>
+<variable id="BHnd$^2p={)ZHA910=Gw">distanceGoodToJunction</variable>
 <variable id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</variable>
 <variable id="%P|YjQB8X]z^B`-VMciK">curPowerLevel</variable>
 <variable id="[SS55+EMQZ=Wu}XZ*m{:">drivetrainMoving</variable>
@@ -19,6 +21,40 @@
 <block type="math_number" id=".!@~/_7~mX1aPFQ9mJvF">
 <field name="NUM">0.5</field>
 </block>
+</value>
+<next>
+<block type="variables_set" id="hqvMg?=BhTkJCp@#Ja]{">
+<field name="VAR" id="W+[-0JTv*bj3)Hs1i)nW">distanceToPickupCone</field>
+<value name="VALUE">
+<block type="math_number" id="]w:jn1#Au*R_@C`Hs@{:">
+<field name="NUM">30</field>
+</block>
+</value>
+<next>
+<block type="variables_set" id="9NV[Ol#wM.4)24j=8hyT">
+<field name="VAR" id="BHnd$^2p={)ZHA910=Gw">distanceGoodToJunction</field>
+<value name="VALUE">
+<block type="math_number" id="A=DomW/$b{--8*UYI)=q">
+<field name="NUM">50</field>
+</block>
+</value>
+<next>
+<block type="led_enableLed_Boolean" id="DyDU[RB7NbWncTcyujE*">
+<field name="IDENTIFIER">greenLEDAsLED</field>
+<data>{"IDENTIFIER":"greenLED"}</data>
+<value name="ENABLE">
+<shadow type="logic_boolean" id="m9Tb}:-d0Od2jb?,nSf`">
+<field name="BOOL">FALSE</field>
+</shadow>
+</value>
+<next>
+<block type="led_enableLed_Boolean" id="OfDWiprzOQz?x4DP8y@5">
+<field name="IDENTIFIER">redLEDAsLED</field>
+<data>{"IDENTIFIER":"redLED"}</data>
+<value name="ENABLE">
+<shadow type="logic_boolean" id="m9qfr!nFJBH5*]*$?Px9">
+<field name="BOOL">FALSE</field>
+</shadow>
 </value>
 <next>
 <block type="comment" id="g-tCI?=Y$Bpr*r{oE_4Z">
@@ -182,6 +218,83 @@
 <field name="VAR" id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</field>
 </block>
 </value>
+<next>
+<block type="controls_if" id="*GVf7?uEy{%5H]22`Dvr">
+<mutation elseif="1" else="1"/>
+<value name="IF0">
+<block type="logic_compare" id="1!}Qy/B3G:g:!-|z=[Iu">
+<field name="OP">LTE</field>
+<value name="A">
+<block type="variables_get" id="5ly%Iq+FOYJ%4-9Qq-rS">
+<field name="VAR" id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</field>
+</block>
+</value>
+<value name="B">
+<block type="variables_get" id="@FigXbEhS`L(??_?I2fi">
+<field name="VAR" id="W+[-0JTv*bj3)Hs1i)nW">distanceToPickupCone</field>
+</block>
+</value>
+</block>
+</value>
+<statement name="DO0">
+<block type="led_enableLed_Boolean" id="fD0}4eiN0|K!s`D_DvkO">
+<field name="IDENTIFIER">greenLEDAsLED</field>
+<data>{"IDENTIFIER":"greenLED"}</data>
+<value name="ENABLE">
+<shadow type="logic_boolean" id="JqPT4Q%*qEhvW:/@NX0_">
+<field name="BOOL">TRUE</field>
+</shadow>
+</value>
+</block>
+</statement>
+<value name="IF1">
+<block type="logic_compare" id="*~tsclDl]qQ2nNME3:^~">
+<field name="OP">LTE</field>
+<value name="A">
+<block type="variables_get" id="kcv~u[u^U`aPBh~nJ)m/">
+<field name="VAR" id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</field>
+</block>
+</value>
+<value name="B">
+<block type="variables_get" id="z]EF6^0KO9}$%Y!+Pg?{">
+<field name="VAR" id="BHnd$^2p={)ZHA910=Gw">distanceGoodToJunction</field>
+</block>
+</value>
+</block>
+</value>
+<statement name="DO1">
+<block type="led_enableLed_Boolean" id="#,eed}+%JWVv^7.GCjr!">
+<field name="IDENTIFIER">redLEDAsLED</field>
+<data>{"IDENTIFIER":"redLED"}</data>
+<value name="ENABLE">
+<shadow type="logic_boolean" id="gkZ4fkHnG!4GcD,ti)Lq">
+<field name="BOOL">TRUE</field>
+</shadow>
+</value>
+</block>
+</statement>
+<statement name="ELSE">
+<block type="led_enableLed_Boolean" id="FraKry$M+Y{k+n-{mKp]">
+<field name="IDENTIFIER">greenLEDAsLED</field>
+<data>{"IDENTIFIER":"greenLED"}</data>
+<value name="ENABLE">
+<shadow type="logic_boolean" id=".eUyM+90FnI1.s{_J%1Z">
+<field name="BOOL">FALSE</field>
+</shadow>
+</value>
+<next>
+<block type="led_enableLed_Boolean" id="-Pg7IC5+hEvT4Nd.Wi$g">
+<field name="IDENTIFIER">redLEDAsLED</field>
+<data>{"IDENTIFIER":"redLED"}</data>
+<value name="ENABLE">
+<shadow type="logic_boolean" id="`uP3PS(3jBlvyZzYF=i(">
+<field name="BOOL">FALSE</field>
+</shadow>
+</value>
+</block>
+</next>
+</block>
+</statement>
 <next>
 <block type="controls_if" id="c1s;~(3($2y/{aiSH2EA">
 <mutation elseif="1"/>
@@ -941,6 +1054,8 @@
 </block>
 </next>
 </block>
+</next>
+</block>
 </statement>
 </block>
 </next>
@@ -948,6 +1063,14 @@
 </next>
 </block>
 </statement>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
+</block>
+</next>
 </block>
 </next>
 </block>
