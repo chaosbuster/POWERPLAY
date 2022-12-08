@@ -129,8 +129,9 @@ public class TestAutoDriveByGyro extends LinearOpMode {
     // For gearing UP, use a gear ratio less than 1.0. Note this will affect the direction of wheel rotation.
     static final double     COUNTS_PER_MOTOR_REV    = 560.0 ;   // REV HD HEX 20:1 Planetary 300 RPM 28x20 (eg: 537.7 for GoBILDA 312 RPM Yellow Jacket)
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // No External Gearing.
-    static final double     WHEEL_DIAMETER_INCHES   = 2.95 ;     // For figuring circumference;  75 mm REV mecanum wheels 
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+    static final double     WHEEL_DIAMETER_INCHES   = 2.95 ;     // For figuring circumference;  75 mm REV mecanum wheels
+    static final double     FRICTION_FACTOR         = 0.95;     // Adjustment for theoretical calculations
+    static final double     COUNTS_PER_INCH         = FRICTION_FACTOR * (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
 
     // These constants define the desired driving/control characteristics
@@ -208,10 +209,11 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
-        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
-        driveLeft (DRIVE_SPEED / 16.0, 18.0, -90.0);       // Drive Left 12"
-        driveStraight(DRIVE_SPEED, -24.0, 0.0);    // Drive Reverse 24"
-        driveLeft (DRIVE_SPEED / 16.0, -18.0, 90.0);       // Drive Right 12"
+        //driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
+        //driveStraight(DRIVE_SPEED, -24.0, 0.0);    // Drive Backward 24"
+        driveLeft (DRIVE_SPEED * 0.50, 24.0, -0.0);       // Drive Left 12"  usually -degrees
+        //driveStraight(DRIVE_SPEED, -24.0, 0.0);    // Drive Reverse 24"
+        //driveLeft (DRIVE_SPEED * 0.4, -24.0, 0.0);       // Drive Right 12"
         
         //driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"        
         //turnToHeading( TURN_SPEED, -45.0);               // Turn  CW to -45 Degrees
@@ -544,11 +546,11 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         driveSpeed = drive;     // save this value as a class member so it can be used by telemetry.
         turnSpeed  = turn;      // save this value as a class member so it can be used by telemetry.
 
-        speedLeftFront  = drive - turn;
-        speedRightBack  = drive - turn;
+        speedLeftFront  = drive + turn;
+        speedRightBack  = drive + turn;
 
-        speedRightFront = drive + turn;
-        speedLeftBack = drive + turn;
+        speedRightFront = drive - turn;
+        speedLeftBack = drive - turn;
 
         // Scale speeds down if either one exceeds +/- 1.0;
         double max = Math.max(Math.max(Math.abs(speedLeftFront), Math.abs(speedRightBack)), Math.max(Math.abs(speedRightFront), Math.abs(speedLeftBack)));

@@ -64,6 +64,10 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
        // Initialize our drive train motors
        initDrivetrainMotors(driveLeftFrontName, driveLeftBackName, driveRightFrontName, driveRightBackName);
        
+       // Initialize to Config X
+        // Set our drive to the default X configuration
+        setDriveToXConfig();
+       
        // Initialize our IMU for pose information
        initIMU();
 
@@ -96,8 +100,6 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
         _driveRightFrontName = driveRightFrontName;
         _driveRightBackName = driveRightBackName;
         
-        // Set our drive to the default X configuration
-        setDriveToXConfig();
         // All drive motor handles below were set in the setDriveToXConfig() method
         
         // Resetting encoders for all drive motors

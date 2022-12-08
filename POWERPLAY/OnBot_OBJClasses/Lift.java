@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
+import org.firstinspires.ftc.robotcore.external.State;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
 
 
 public class Lift extends BlocksOpModeCompanion {
@@ -27,7 +30,7 @@ public class Lift extends BlocksOpModeCompanion {
 
   // Determines whether the lift is in an event driven mode of moving to a target
   static boolean liftMovingToTarget = false;
-  static double targetLevel = voltageLowest;  //  Target level by holding button
+  static double targetLevel = voltageLowest;  
   static double targetThreshold = 0.035;
   
   // Will be current reading for our analog sensor associated with lift
@@ -46,7 +49,99 @@ public class Lift extends BlocksOpModeCompanion {
   static double liftPowerScaledMoveUp = (liftPowerToMoveUp - liftPowerMin) / liftPowerRange;;
   static double liftPowerScaledMoveDown = (liftPowerToMoveDown - liftPowerMin) / liftPowerRange;
 
+  // Run states for our lift
+  // NOTE:  A target level must be set for the lift to raise or lower
+  static private enum State {
+      START,
+      LOWER_LIFT, 
+      STOP_LIFT,
+      RAISE_LIFT,       
+      END
+  }
+  
+  static State liftState;
+  
+  
+  //=======================================================================
 
+  @ExportToBlocks (
+    heading = "Run Lift Based on State",
+    color = 255,
+    comment = "Runs lift based on the state of lift.",
+    tooltip = "States are changed by using the 'set' functions."
+  )
+  /**
+   * Runs an interation of the lift based on it's current state
+   * Running the lift in a STATE mode allows for other actions to happen on the robot
+   */
+  public static void runLiftIteration() {
+    
+    // Get our lastest voltage (aka lift position)
+    currentVoltage = liftVoltage.getVoltage();
+ 
+    switch (liftState) {
+      
+      case START: {
+        break;
+      }
+
+      case LOWER_LIFT: {
+        // Move down until able to reach our targetLevel or lowest limit
+        if (currentVoltage > voltageLowest && targetLevel < currentVoltage) {
+
+        // Initiate moving down to target
+        servoLift.setPosition(liftPowerScaledMoveDown);
+        
+        telemetry.addData("Lift Movement: ", "DOWN");
+        telemetry.addData("Lift Target Level: ", targetLevel);
+        telemetry.addData("Lift Current Voltage: ", currentVoltage);
+
+        } else {
+          stopLiftMovement();               
+          liftState = State.STOP_LIFT;
+        }
+
+        break;
+      }
+
+      case STOP_LIFT: {
+        
+        stopLiftMovement();    
+                
+        telemetry.addData("Lift Movement: ", "STOP");
+        telemetry.addData("Lift Last Target Level: ", targetLevel);
+        telemetry.addData("Lift Current Voltage: ", currentVoltage);
+
+        break;
+      }
+
+      case RAISE_LIFT: {
+        
+        if (currentVoltage < voltageHighest && targetLevel > currentVoltage) {
+          
+          // Initiate moving up to target
+          servoLift.setPosition(liftPowerScaledMoveUp);
+        
+          telemetry.addData("Lift Movement: ", "UP");
+          telemetry.addData("Lift Target Level: ", targetLevel);
+          telemetry.addData("Lift Current Voltage: ", currentVoltage);
+ 
+        } else {
+          stopLiftMovement();               
+          liftState = State.STOP_LIFT;
+        }
+
+        break;
+      }
+
+      case END: {
+        break;
+      }
+    }
+
+  }
+  
+  
   @ExportToBlocks (
     heading = "Initialize Lift",
     color = 255,
@@ -58,6 +153,8 @@ public class Lift extends BlocksOpModeCompanion {
    * Initialization of lift and variables
    */
   public static void initLift(String liftMotorName, String liftAnalogSensorName) {
+    
+    liftState = State.START;
 
     // initialize our handles on hardware parts of our lift
     // String names provided to this function should be the same as those in active hardware configuration
@@ -66,11 +163,9 @@ public class Lift extends BlocksOpModeCompanion {
  
     telemetry.addData("Lowest voltage", Double.parseDouble(JavaUtil.formatNumber(voltageLowest, 2)));
     telemetry.addData("Highest voltage", Double.parseDouble(JavaUtil.formatNumber(voltageHighest, 2)));
-    telemetry.addData("Scaled Power to Move Lift Up:", Double.parseDouble(JavaUtil.formatNumber(liftPowerScaledMoveUp, 2)));
-    telemetry.addData("Scaled Power to Move Lift Down:", Double.parseDouble(JavaUtil.formatNumber(liftPowerScaledMoveDown, 2)));
-    telemetry.addData("Scaled Power for No Movement:", Double.parseDouble(JavaUtil.formatNumber(liftPowerScaledNoMovement, 2)));
+    
   }  // end method initLift()
-  
+
   @ExportToBlocks (
     heading = "Stop Lift Movement",
     color = 255,
@@ -80,75 +175,13 @@ public class Lift extends BlocksOpModeCompanion {
   /**
    * Stop movement of the lift
    */
-  public static double stopLiftMovement() {
-    
-    // Make sure our event driven routines to lift to a target level will also stop
-    liftMovingToTarget = false;
+  public static void stopLiftMovement() {
 
-    // Get our lastest voltage (aka lift position)
-    currentVoltage = liftVoltage.getVoltage();
-
-    // Default target is current position     
-    targetLevel = currentVoltage;
-
-    telemetry.addData("Lift Power for NO Movement:", liftPowerScaledNoMovement);
-    
     servoLift.setPosition(liftPowerScaledNoMovement);
-
-    return currentVoltage;
+    liftState = State.STOP_LIFT;
     
   }  // end method stopLiftMovement()
-
-  @ExportToBlocks (
-    heading = "Determine Whether Moving To Target Lift Level",
-    color = 255,
-    comment = "Returns whether we are moving to a target lift level",
-    tooltip = "Returns whether we are moving to a target lift level"
-  )
-  /**
-   * Returns whether we are moving to a target lift level
-   */
-  public static boolean movingToTarget() {
-    return liftMovingToTarget;
-  }  // end method movingToTarget()
-  
-  @ExportToBlocks (
-    heading = "Have We Reached Target Lift Level",
-    color = 255,
-    comment = "This method is called in the running OpsMode AFTER calling moveToLevelSpecified",
-    tooltip = "To stop this action you need to manually raise or lower the lift."
-  )
-  /**
-   * Follow-up to check if we have reached our target lift level
-   * Should check to make sure not reaching high or low limit
-   */
-  public static boolean targetLevelReached() {
-    
-    // if already out of state then exit
-    if ( !liftMovingToTarget )
-      return liftMovingToTarget;
-      
-    // Get our lastest voltage (aka lift position)
-    currentVoltage = liftVoltage.getVoltage();
-    
-    // See if we are within acceptable range of our target level
-    if (Math.abs(currentVoltage - targetLevel) < targetThreshold) {
-      stopLiftMovement();
-      liftMovingToTarget = false;
-      return liftMovingToTarget;
-    }
-
-    // Stop if we are close to our limits    
-    if ((currentVoltage <= voltageLowest) || (currentVoltage >= voltageHighest)) {
-      stopLiftMovement();
-      liftMovingToTarget = false;
-      return liftMovingToTarget;
-    }
-
-    return liftMovingToTarget;
-    
-  }  // end method targetLevelReached()
-  
+ 
   @ExportToBlocks (
     heading = "Move To Level Specified",
     color = 255,
@@ -157,18 +190,17 @@ public class Lift extends BlocksOpModeCompanion {
     parameterLabels = {"Level Request", "Is Grabber Closed"}
   )
   /**
-   * Initiate a move of the lift to a specified level 
-   * Will need to either move up or down
-   * Should check to make sure not reaching high or low limit
-   * ==> NEED TO CALL targetLevelReached() in the calling program of this method to stop the action <==
+   * Initiate a move of the lift to a level requested using our STATEs.
+   * By using STATEs the action of the lift moving up/down does not block  
+   * the drivetrain and other actions requested by drivers.
+   * Should check to make sure not reaching over the high or below low limit
    */
-  public static boolean moveToLevelSpecified(int levelRequested, boolean grabberClosed) {
+  public static void moveToLevelSpecified(int levelRequested, boolean grabberClosed) {
     
     // invalid index to an array
     if (levelRequested < 0) {
       stopLiftMovement();
-      liftMovingToTarget = false;
-      return liftMovingToTarget;
+      return;
     }
 
     // Determine which level [Junction or Pickup] is being requesting
@@ -179,8 +211,7 @@ public class Lift extends BlocksOpModeCompanion {
       // if an invalid index to the Junction levels, then just return and don't do anything
       if (levelRequested > liftJunctionLevel.length - 1) {
         stopLiftMovement();
-        liftMovingToTarget = false;
-        return liftMovingToTarget;
+        return;
       }
       
       // Set our target voltage level to the level requested  
@@ -192,8 +223,7 @@ public class Lift extends BlocksOpModeCompanion {
       // if an invalid index to the pickup levels, then just return and don't do anything
       if (levelRequested > liftPickupLevel.length - 1) {
         stopLiftMovement();
-        liftMovingToTarget = false;
-        return liftMovingToTarget;
+        return;
       }
       
       // Set our target voltage level to the level requested  
@@ -202,76 +232,87 @@ public class Lift extends BlocksOpModeCompanion {
     }
     
     // if target level is past our maximum limit then return and don't do anything
-    if (targetLevel >= voltageHighest ) {
-      stopLiftMovement();
-      liftMovingToTarget = false;
-      return liftMovingToTarget;
+    if (targetLevel > voltageHighest ) {
+      targetLevel = voltageHighest;
     // if target level is past our low limit then return and don't do anything
-    } else if (targetLevel <= voltageLowest) {
-      stopLiftMovement();
-      liftMovingToTarget = false;
-      return liftMovingToTarget;
+    } else if (targetLevel < voltageLowest) {
+      targetLevel = voltageLowest;
     }
+
+    // Get our lastest voltage (aka lift position)
+    currentVoltage = liftVoltage.getVoltage();
 
     // Set information to be displayed
     telemetry.addData("Lift TARGET LEVEL: ", targetLevel);
     telemetry.addData("Lift CURRENT VOLTAGE: ", currentVoltage);
-    telemetry.addData("Lift Power To Move Up: ", liftPowerScaledMoveUp);
-    telemetry.addData("Lift Power To Move Down: ", liftPowerScaledMoveDown );
-    telemetry.addData("Lift MAX: ", voltageHighest);
-    telemetry.addData("Lift LOW: ", voltageLowest);
-
-    telemetry.update();
-
-    // Get our lastest voltage (aka lift position)
-    currentVoltage = liftVoltage.getVoltage();
     
     // If target level is higher than our current level then initiate moving up
     if (isTargetLevelHigher(targetLevel)) {
-      // Move up until able to reach our targetDropLevel or Highest limit
+      // Move up until able to reach our target drop level or high limit
       if (currentVoltage < voltageHighest && targetLevel > currentVoltage) {
+          
+        // Set our lift state to move up
+        liftState = State.RAISE_LIFT;
 
         // Initiate moving up to target
-        servoLift.setPosition(liftPowerScaledMoveUp);
+        //servoLift.setPosition(liftPowerScaledMoveUp);
         
-        currentVoltage = liftVoltage.getVoltage();
-        telemetry.addData("Lift Target Level: ", targetLevel);
-        telemetry.addData("Lift Current Voltage: ", currentVoltage);
+        telemetry.addData("Lift Movement: ", "UP");
 
-        // Save our event driven state that we are moving to a target
-        liftMovingToTarget = true;
-        
       } else {
         stopLiftMovement();
-        liftMovingToTarget = false;
       }
+     
     
     // If target level is lower than our current level then initiate moving down
     } else {
       // Move down until able to reach our targetLevel or lowest limit
       if (currentVoltage > voltageLowest && targetLevel < currentVoltage) {
 
-        // Initiate moving down to target
-        servoLift.setPosition(liftPowerScaledMoveDown);
+        // Set our lift state to move up
+        liftState = State.LOWER_LIFT;  
         
-        currentVoltage = liftVoltage.getVoltage();
-        telemetry.addData("Lift Target Level: ", targetLevel);
-        telemetry.addData("Lift Current Voltage: ", currentVoltage);
+        telemetry.addData("Lift Movement: ", "DOWN");
 
-        // Save our event driven state that we are moving to a target
-        liftMovingToTarget = true;
         
       } else {
         stopLiftMovement();
-        liftMovingToTarget = false;
+
       }
       
     }
-  
-    return liftMovingToTarget;
     
   }  // end method moveToNextHigherDropLevelVoltage()
 
+  /**
+   * Checks to see if we have already reached our target lift level
+   * before setting a lift state to RAISE or LOWER the lift.
+   * Should also check to make sure not reaching high or low limit
+   */
+  private static boolean targetLevelReached() {
+      
+    // Get our lastest voltage (aka lift position)
+    currentVoltage = liftVoltage.getVoltage();
+    
+    // See if we are within acceptable range of our target level
+    if (Math.abs(currentVoltage - targetLevel) < targetThreshold) {
+      stopLiftMovement();
+      return true;
+    }
+
+    // Stop if we are close to our limits    
+    if ((currentVoltage <= voltageLowest) || (currentVoltage >= voltageHighest)) {
+      stopLiftMovement();
+      return true;
+    }
+
+    return false;
+    
+  }  // end method targetLevelReached()
+  
+    /**
+   *  Determines where the target level is based on the current voltage
+   */
   private static boolean isTargetLevelHigher(double targetVoltage) {
     /*   Returns the following:
      *        TRUE  Target is greater than current voltage
@@ -288,6 +329,9 @@ public class Lift extends BlocksOpModeCompanion {
     
   }  // end method isTargetLevelHigher()
 
+  // Internal function to find the next higher junction level ONLY
+  // Status: NOT USED
+  // A more optimal solution was coded with lift STATEs
   private static double findNextHigherJunctionLevelVoltage() {
     /*   Returns the following:
      *        -1  Higher level is greater than lift maximum height limit
@@ -295,8 +339,8 @@ public class Lift extends BlocksOpModeCompanion {
      *   +double  Voltage of Junction level higher than current voltage
      */
 
-    // Get our lastest voltage (aka lift position) while also stopping lift movement
-    currentVoltage = stopLiftMovement();
+    // Get our lastest voltage (aka lift position)
+    currentVoltage = liftVoltage.getVoltage();
     
     for (int i = 0; i < liftJunctionLevel.length; i++) {
       if (currentVoltage < liftJunctionLevel[i]) {
@@ -314,7 +358,9 @@ public class Lift extends BlocksOpModeCompanion {
     
   }  // end method findNextHigherJunctionLevelVoltage()
 
-
+  // Internal function to find the next lower junction level ONLY
+  // Status: NOT USED
+  // A more optimal solution was coded with lift STATEs
   private static double findNextLowerJunctionLevelVoltage() {
     /*   Returns the following:
      *        -1  Lower level is lower than lift lowest height limit
@@ -323,8 +369,8 @@ public class Lift extends BlocksOpModeCompanion {
      *   ASSUMPTION: Voltage is always positive.
      */
 
-    // Get our lastest voltage (aka lift position) while also stopping lift movement
-    currentVoltage = stopLiftMovement();
+    // Get our lastest voltage (aka lift position)
+    currentVoltage = liftVoltage.getVoltage();
     
     for (int i = liftJunctionLevel.length-1; i >= 0; i--) {
       if (currentVoltage > liftJunctionLevel[i]) {
@@ -351,11 +397,14 @@ public class Lift extends BlocksOpModeCompanion {
   /**
    * Move lift up one Junction level 
    * Should check to make sure not reaching high limit
+   * WARNING: This function will block all actions until done.  
+   * Status: NOT USED
+   * A more optimal solution was coded with lift STATEs
    */
-  public static double moveToNextHigherJunctionLevelVoltage() {
+  public static void moveToNextHigherJunctionLevelVoltage() {
     
-    // Get our lastest voltage (aka lift position) while also stopping lift movement
-    currentVoltage = stopLiftMovement();
+    // Get our lastest voltage (aka lift position)
+    currentVoltage = liftVoltage.getVoltage();
     
     targetLevel = findNextHigherJunctionLevelVoltage();
     
@@ -363,16 +412,15 @@ public class Lift extends BlocksOpModeCompanion {
     telemetry.addData("Lift Request:", "Move To Next Higher Level" );
     telemetry.addData("Lift Target Junction Level: ", targetLevel);
     telemetry.addData("Lift Max Limit: ", currentVoltage);
-    telemetry.addData("Lift Power To Move Up: ", liftPowerScaledMoveUp);
-    telemetry.addData("Lift Max Limit: ", voltageHighest);
 
     telemetry.update();
   
     // if targetJunctionLevel is -1 or 0 then we don't move up
     // will return the current voltage and get out of our method
     if (targetLevel <= 0.0)
-      return currentVoltage;
-      
+      return;
+    
+
     // Move up until able to reach our targetDropLevel or Highest limit
     while (currentVoltage < voltageHighest && targetLevel > currentVoltage) {
       servoLift.setPosition(liftPowerScaledMoveUp);
@@ -381,10 +429,10 @@ public class Lift extends BlocksOpModeCompanion {
       telemetry.addData("Lift Current Voltage: ", currentVoltage);
       telemetry.update();
     }
+        
+    stopLiftMovement();
     
-    currentVoltage = stopLiftMovement();
-
-    return currentVoltage;
+    return;
     
   }  // end method moveToNextHigherJunctionLevelVoltage()
 
@@ -398,11 +446,14 @@ public class Lift extends BlocksOpModeCompanion {
   /**
    * Move lift down one Junction level 
    * Should check to make sure not reaching low limit
+   * WARNING: This function will block all actions until done.  
+   * Status: NOT USED
+   * A more optimal solution was coded with lift STATEs
    */
-  public static double moveToNextLowerJunctionLevelVoltage() {
+  public static void moveToNextLowerJunctionLevelVoltage() {
 
-    // Get our lastest voltage (aka lift position) while also stopping lift movement
-    currentVoltage = stopLiftMovement();
+    // Get our lastest voltage (aka lift position)
+    currentVoltage = liftVoltage.getVoltage();
     
     targetLevel = findNextLowerJunctionLevelVoltage();
     
@@ -418,7 +469,7 @@ public class Lift extends BlocksOpModeCompanion {
     // if targetJunctionLevel is -1 or 0 then we don't move
     // will return the current voltage and get out of our method
     if (targetLevel <= 0.0)
-      return currentVoltage;
+      return;
       
     // Move down until able to reach our targetJunctionLevel or lowest limit
     while (currentVoltage > voltageLowest && targetLevel < currentVoltage) {
@@ -428,72 +479,12 @@ public class Lift extends BlocksOpModeCompanion {
       telemetry.addData("Lift Current Voltage: ", currentVoltage);
     }
     
-    currentVoltage = stopLiftMovement();
+    stopLiftMovement();
 
-    return currentVoltage;
+    return;
     
   }  // end method moveToNextLowerJunctionLevelVoltage()
 
-  @ExportToBlocks (
-    heading = "Move Up",
-    color = 255,
-    comment = "Move Lift up.",
-    tooltip = "Move lift up."
-  )
-  /**
-   * Move lift up if not at the highest limit
-   */
-  public static double moveUp() {
-    
-    // Make sure our event driven routines to lift to a target level will also stop
-    liftMovingToTarget = false;
-    
-    // Set information to be displayed
-    telemetry.addData("Lift Highest Limit: ", voltageHighest);
-    
-    // Get our lastest voltage (aka lift position)
-    targetLevel = currentVoltage = liftVoltage.getVoltage();
-
-    if (currentVoltage <= voltageHighest) {
-      servoLift.setPosition(liftPowerScaledMoveUp);
-      currentVoltage = liftVoltage.getVoltage();
-
-    } else {
-      currentVoltage = stopLiftMovement();
-    }
-    return currentVoltage;
-  }  // end method moveUp()
-
-  @ExportToBlocks (
-    heading = "Move Down",
-    color = 255,
-    comment = "Move Lift down.",
-    tooltip = "Move lift down."
-  )
-  /**
-   * Move lift down if not at the lowest limit
-   */
-  public static double moveDown() {
-    
-    // Make sure our event driven routines to lift to a target level will also stop
-    liftMovingToTarget = false;
-    
-    // Set information to be displayed
-    telemetry.addData("Lift Power for Moving Down: ", liftPowerScaledMoveDown);
-    telemetry.addData("Lift Lower Limit: ", voltageLowest);
-    
-    // Get our lastest voltage (aka lift position)
-    targetLevel = currentVoltage = liftVoltage.getVoltage();
-
-    if (currentVoltage >= voltageLowest) {
-      servoLift.setPosition(liftPowerScaledMoveDown);
-      currentVoltage = liftVoltage.getVoltage();
-      telemetry.addData("Lift Action:", "Moving Down");
-    } else {
-      currentVoltage = stopLiftMovement();
-    }
-    return currentVoltage;
-  }  // end method moveDown()
 
   @ExportToBlocks (
     heading = "Lift Info",
@@ -505,8 +496,9 @@ public class Lift extends BlocksOpModeCompanion {
    * Sets telemetry to display for lift
    */
   public static void setToDisplayLiftInfo() {
-    telemetry.addData("Lift Power:", servoLift.getPosition());
+    telemetry.addData("Lift Current Servo Position:", servoLift.getPosition());
     telemetry.addData("Lift Voltage:", currentVoltage);
+
   }  // end method setToDisplayLiftInfo()
   
 }  // end class Lift

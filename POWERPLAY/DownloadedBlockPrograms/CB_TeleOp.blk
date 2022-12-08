@@ -4,8 +4,6 @@
 <variable id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</variable>
 <variable id="%P|YjQB8X]z^B`-VMciK">curPowerLevel</variable>
 <variable id="[SS55+EMQZ=Wu}XZ*m{:">drivetrainMoving</variable>
-<variable id="|{)9T-mP3T5eS7AMFo],">currentVoltage</variable>
-<variable id="P(me_k,].S5tT((qG|Pp">booleanMovingToLiftTarget</variable>
 </variables>
 <block type="procedures_defnoreturn" id=".C5qAWP%TVp.hOLyFe(w" deletable="false" x="137" y="10">
 <field name="NAME">runOpMode</field>
@@ -138,16 +136,11 @@
 <block type="comment" id="u(VJvZJERNpN$v^,:k%2">
 <field name="COMMENT">Our main driver-control loop</field>
 <next>
-<block type="variables_set" id="[1QaVBz2nAl3!r;z{YdA">
-<field name="VAR" id="|{)9T-mP3T5eS7AMFo],">currentVoltage</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id="~izupj=6L$dQ^.y-Ry)w">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift stopLiftMovement() double" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="double" color="255" heading="Stop Lift Movement" comment="Stop lift movement." tooltip="Stop lift movement." accessMethod="callJava_String" convertReturnValue="Number"/>
+<block type="misc_callJava_noReturn" id="DLc.z`ORL,,8sT/xu,X_">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift stopLiftMovement() void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="void" color="255" heading="Stop Lift Movement" comment="Stop lift movement." tooltip="Stop lift movement." accessMethod="callJava" convertReturnValue=""/>
 <field name="CLASS_NAME">Lift</field>
 <field name="METHOD_NAME">stopLiftMovement</field>
 <comment pinned="false" h="80" w="160">Stop lift movement.</comment>
-</block>
-</value>
 <next>
 <block type="controls_whileUntil" id="x+6xBn4:_+Iq]kCttUSS">
 <field name="MODE">WHILE</field>
@@ -184,79 +177,30 @@
 </block>
 </value>
 <next>
-<block type="controls_if" id="En!pK|VG5~1?J,+w.}oz">
+<block type="controls_if" id="zTB79zl]CdnlrfO7)3^r">
+<mutation elseif="1"/>
 <value name="IF0">
-<block type="misc_callJava_return" id="}zbh5tOTV=O{c.8;0)0c" collapsed="true">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift movingToTarget() boolean" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="boolean" color="255" heading="Determine Whether Moving To Target Lift Level" comment="Returns whether we are moving to a target lift level" tooltip="Returns whether we are moving to a target lift level" accessMethod="callJava_boolean" convertReturnValue=""/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">movingToTarget</field>
-<comment pinned="false" h="80" w="160">Returns whether we are moving to a target lift level</comment>
-</block>
-</value>
-<statement name="DO0">
-<block type="telemetry_addTextData_All" id="mtZHhOW#H:PbpkIzqN`I">
-<value name="KEY">
-<shadow type="text" id="Fv5p78JmnXJVX4VNo9eh">
-<field name="TEXT">Moving To Target</field>
-</shadow>
-</value>
-<value name="TEXT">
-<shadow type="text" id="[9TlwI,CO{%:_v.j2ikv">
-<field name="TEXT">TRUE</field>
-</shadow>
-</value>
-<next>
-<block type="controls_if" id="8,Myg/7lc.PHAUDf8[2)">
-<value name="IF0">
-<block type="misc_callJava_return" id="3$K9gcWCx1mC[wYKwCjK">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift targetLevelReached() boolean" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="boolean" color="255" heading="Have We Reached Target Lift Level" comment="This method is called in the running OpsMode AFTER calling moveToLevelSpecified" tooltip="To stop this action you need to manually raise or lower the lift." accessMethod="callJava_boolean" convertReturnValue=""/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">targetLevelReached</field>
-<comment pinned="false" h="80" w="160">This method is called in the running OpsMode AFTER calling moveToLevelSpecified</comment>
-</block>
-</value>
-<statement name="DO0">
-<block type="variables_set" id=",H}945o61vyql)Hn[jJ%">
-<field name="VAR" id="|{)9T-mP3T5eS7AMFo],">currentVoltage</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id="iC+:9jATI0|mt]KXk*z3">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift stopLiftMovement() double" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="double" color="255" heading="Stop Lift Movement" comment="Stop lift movement." tooltip="Stop lift movement." accessMethod="callJava_String" convertReturnValue="Number"/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">stopLiftMovement</field>
-<comment pinned="false" h="80" w="160">Stop lift movement.</comment>
-</block>
-</value>
-</block>
-</statement>
-</block>
-</next>
-</block>
-</statement>
-<next>
-<block type="controls_if" id="e-5_R*VM8)!pp3~x21fl">
-<mutation elseif="8" else="1"/>
-<value name="IF0">
-<block type="gamepad_getProperty_Boolean" id="Y4l|6cz~|^Q$mch-nohQ">
+<block type="gamepad_getProperty_Boolean" id="%S0`]0ytf:vZ;16;2m:~">
 <field name="IDENTIFIER">gamepad2</field>
 <field name="PROP">RightBumper</field>
 <data>{"IDENTIFIER":"gamepad2"}</data>
 </block>
 </value>
 <statement name="DO0">
-<block type="misc_callJava_noReturn" id="o=/%}[+cEB.6MU.HPRfT">
+<block type="misc_callJava_noReturn" id="ZR;59rNGH#wLNsBB#M=f">
 <mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber closeGrabber() void" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="0" returnType="void" color="255" heading="Grabber" comment="Action to close grabber and grab." tooltip="Action to close grabber and grab." accessMethod="callJava" convertReturnValue=""/>
 <field name="CLASS_NAME">Grabber</field>
 <field name="METHOD_NAME">closeGrabber</field>
 <comment pinned="false" h="80" w="160">Action to close grabber and grab.</comment>
 <next>
-<block type="telemetry_addTextData_All" id="=j*Sg+}Qb)24sA^g@FxD">
+<block type="telemetry_addTextData_All" id="[K).r+.vUc4pqF`)cd$g">
 <value name="KEY">
-<shadow type="text" id="MkWeD%i~^n_W|vw.Re*q">
+<shadow type="text" id="HJY0NSoFGOc.eH?$aYa[">
 <field name="TEXT">GamePad1</field>
 </shadow>
 </value>
 <value name="TEXT">
-<shadow type="text" id="jm$lx+Va+G9_v.i`$LX[">
+<shadow type="text" id="JtXsZMc[wVA|!9zreDJ8">
 <field name="TEXT">Close grabber</field>
 </shadow>
 </value>
@@ -265,37 +209,37 @@
 </block>
 </statement>
 <value name="IF1">
-<block type="logic_compare" id="o-jpfzxG`u4aAAWz0elc">
+<block type="logic_compare" id="fT_7FX+X.MJohuA6lEgy">
 <field name="OP">GT</field>
 <value name="A">
-<block type="gamepad_getProperty_Number" id="`8fL_0X[EW4U~,Xyds|t">
+<block type="gamepad_getProperty_Number" id="1gHUq/(L5]?UWZDw:uMt">
 <field name="IDENTIFIER">gamepad2</field>
 <field name="PROP">RightTrigger</field>
 <data>{"IDENTIFIER":"gamepad2"}</data>
 </block>
 </value>
 <value name="B">
-<block type="variables_get" id="~)au,Qx}6fJ!=5@0.8N*">
+<block type="variables_get" id="DQ3{Z_,C5T=Ow!MIwz{!">
 <field name="VAR" id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</field>
 </block>
 </value>
 </block>
 </value>
 <statement name="DO1">
-<block type="misc_callJava_noReturn" id="7a?0*66f:ffHpmczcC@:">
+<block type="misc_callJava_noReturn" id="eZPlaaDNOIjPuy3DPhTV">
 <mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber openGrabber() void" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="0" returnType="void" color="255" heading="Grabber" comment="Action to open grabber and release." tooltip="Action to open grabber and release." accessMethod="callJava" convertReturnValue=""/>
 <field name="CLASS_NAME">Grabber</field>
 <field name="METHOD_NAME">openGrabber</field>
 <comment pinned="false" h="80" w="160">Action to open grabber and release.</comment>
 <next>
-<block type="telemetry_addTextData_All" id="IP(2[HTinPfQmV{[u+zv">
+<block type="telemetry_addTextData_All" id="d?/JQ0j712VS,0sjSHq2">
 <value name="KEY">
-<shadow type="text" id="aNszYS?BG!,d)s=J-|lj">
+<shadow type="text" id="q(=,Rx6t[}y~/bh30qVH">
 <field name="TEXT">GamePad1</field>
 </shadow>
 </value>
 <value name="TEXT">
-<shadow type="text" id="~kFH-Ri`9uP{26p;f[S7">
+<shadow type="text" id="aD?{Q3-g6vXeNr]m{n-T">
 <field name="TEXT">Release grabber</field>
 </shadow>
 </value>
@@ -303,131 +247,91 @@
 </next>
 </block>
 </statement>
+<next>
+<block type="controls_if" id="e-5_R*VM8)!pp3~x21fl">
+<mutation elseif="2" else="1"/>
+<value name="IF0">
+<block type="gamepad_getProperty_Boolean" id="Y2Wgrn_W.0@YNNCP8*-A">
+<field name="IDENTIFIER">gamepad2</field>
+<field name="PROP">A</field>
+<data>{"IDENTIFIER":"gamepad2"}</data>
+</block>
+</value>
+<statement name="DO0">
+<block type="misc_callJava_noReturn" id="KupY55-E7*rj/a2O+ZTv">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToLevelSpecified(int,boolean) void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="void" color="255" heading="Move To Level Specified" comment="Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed." tooltip="Move to a level. Send -1 to check status if ready to stop." accessMethod="callJava" convertReturnValue="" argLabel0="Level Request" argType0="int" argAuto0="" argLabel1="Is Grabber Closed" argType1="boolean" argAuto1=""/>
+<field name="CLASS_NAME">Lift</field>
+<field name="METHOD_NAME">moveToLevelSpecified</field>
+<comment pinned="false" h="80" w="160">Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed.</comment>
+<value name="ARG0">
+<shadow type="math_number" id="O*Facj0@;+|IyhAJ4cq=">
+<field name="NUM">0</field>
+</shadow>
+</value>
+<value name="ARG1">
+<shadow type="logic_boolean">
+<field name="BOOL">FALSE</field>
+</shadow>
+<block type="misc_callJava_return" id="*[%S=y6:K9,dR_Y%r0Ul">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber isGrabberClosed() boolean" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="0" returnType="boolean" color="255" heading="Is Grabber Closed" comment="Returns whether the grabber is closed." tooltip="Returns a TRUE if grabber is closed." accessMethod="callJava_boolean" convertReturnValue=""/>
+<field name="CLASS_NAME">Grabber</field>
+<field name="METHOD_NAME">isGrabberClosed</field>
+<comment pinned="false" h="80" w="160">Returns whether the grabber is closed.</comment>
+</block>
+</value>
+</block>
+</statement>
+<value name="IF1">
+<block type="gamepad_getProperty_Boolean" id="g(|BzmRyZR]8?*D^Dq[z">
+<field name="IDENTIFIER">gamepad2</field>
+<field name="PROP">B</field>
+<data>{"IDENTIFIER":"gamepad2"}</data>
+</block>
+</value>
+<statement name="DO1">
+<block type="misc_callJava_noReturn" id="@h=,bcih]U0lTN}bOTWl">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToLevelSpecified(int,boolean) void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="void" color="255" heading="Move To Level Specified" comment="Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed." tooltip="Move to a level. Send -1 to check status if ready to stop." accessMethod="callJava" convertReturnValue="" argLabel0="Level Request" argType0="int" argAuto0="" argLabel1="Is Grabber Closed" argType1="boolean" argAuto1=""/>
+<field name="CLASS_NAME">Lift</field>
+<field name="METHOD_NAME">moveToLevelSpecified</field>
+<comment pinned="false" h="80" w="160">Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed.</comment>
+<value name="ARG0">
+<shadow type="math_number" id="v-q{*l!T,6GwtfIuo_5.">
+<field name="NUM">1</field>
+</shadow>
+</value>
+<value name="ARG1">
+<shadow type="logic_boolean">
+<field name="BOOL">FALSE</field>
+</shadow>
+<block type="misc_callJava_return" id="VP3)w|k;wvcqY8$z@Fy[">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber isGrabberClosed() boolean" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="0" returnType="boolean" color="255" heading="Is Grabber Closed" comment="Returns whether the grabber is closed." tooltip="Returns a TRUE if grabber is closed." accessMethod="callJava_boolean" convertReturnValue=""/>
+<field name="CLASS_NAME">Grabber</field>
+<field name="METHOD_NAME">isGrabberClosed</field>
+<comment pinned="false" h="80" w="160">Returns whether the grabber is closed.</comment>
+</block>
+</value>
+</block>
+</statement>
 <value name="IF2">
-<block type="gamepad_getProperty_Boolean" id="CAZ28Rg)]Lq]FV:*l7Yk">
-<field name="IDENTIFIER">gamepad2</field>
-<field name="PROP">DpadUp</field>
-<data>{"IDENTIFIER":"gamepad2"}</data>
-</block>
-</value>
-<statement name="DO2">
-<block type="variables_set" id="umQ1,rVAMBs#bC^Y-^p#">
-<field name="VAR" id="|{)9T-mP3T5eS7AMFo],">currentVoltage</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id="drMfurEqKFnuU=gygs;I">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveUp() double" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="double" color="255" heading="Move Up" comment="Move Lift up." tooltip="Move lift up." accessMethod="callJava_String" convertReturnValue="Number"/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">moveUp</field>
-<comment pinned="false" h="80" w="160">Move Lift up.</comment>
-</block>
-</value>
-</block>
-</statement>
-<value name="IF3">
-<block type="gamepad_getProperty_Boolean" id="R[8K:g58na*}F?/{pE]F">
-<field name="IDENTIFIER">gamepad2</field>
-<field name="PROP">DpadDown</field>
-<data>{"IDENTIFIER":"gamepad2"}</data>
-</block>
-</value>
-<statement name="DO3">
-<block type="variables_set" id="WAvK[%joNE;x9Q`BY?l=">
-<field name="VAR" id="|{)9T-mP3T5eS7AMFo],">currentVoltage</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id="A@`|R=rSU[WlSmq@e~!;">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveDown() double" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="double" color="255" heading="Move Down" comment="Move Lift down." tooltip="Move lift down." accessMethod="callJava_String" convertReturnValue="Number"/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">moveDown</field>
-<comment pinned="false" h="80" w="160">Move Lift down.</comment>
-</block>
-</value>
-</block>
-</statement>
-<value name="IF4">
-<block type="gamepad_getProperty_Boolean" id="/~bp-8e?TP{#uf)9r/Dz">
-<field name="IDENTIFIER">gamepad2</field>
-<field name="PROP">LeftBumper</field>
-<data>{"IDENTIFIER":"gamepad2"}</data>
-</block>
-</value>
-<statement name="DO4">
-<block type="variables_set" id="[twO3H|@ZCDquv+cwjZd">
-<field name="VAR" id="|{)9T-mP3T5eS7AMFo],">currentVoltage</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id="R8RwEtu@oos}N;q!1dpt">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToNextHigherJunctionLevelVoltage() double" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="double" color="255" heading="Move To Next Higher Junction Level" comment="Move to next higher Junction level." tooltip="Move to next higher Junction level." accessMethod="callJava_String" convertReturnValue="Number"/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">moveToNextHigherJunctionLevelVoltage</field>
-<comment pinned="false" h="80" w="160">Move to next higher Junction level.</comment>
-</block>
-</value>
-</block>
-</statement>
-<value name="IF5">
-<block type="logic_compare" id="D!-2no$F5mn`Lw}+WCiv">
-<field name="OP">GT</field>
-<value name="A">
-<block type="gamepad_getProperty_Number" id="4HDA}`z#~aeJgswAOo?:">
-<field name="IDENTIFIER">gamepad2</field>
-<field name="PROP">LeftTrigger</field>
-<data>{"IDENTIFIER":"gamepad2"}</data>
-</block>
-</value>
-<value name="B">
-<block type="variables_get" id="Y$$6J5oLXZ|*Q$o8J-Vs">
-<field name="VAR" id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</field>
-</block>
-</value>
-</block>
-</value>
-<statement name="DO5">
-<block type="variables_set" id="ESF3,{zdXhXsTy%1+)m.">
-<field name="VAR" id="|{)9T-mP3T5eS7AMFo],">currentVoltage</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id="yYVowRKu@B?1a(1.lbn[">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToNextLowerJunctionLevelVoltage() double" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="double" color="255" heading="Move To Next Lower Junction Level" comment="Move to next lower Junction level." tooltip="Move to next lower Junction level." accessMethod="callJava_String" convertReturnValue="Number"/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">moveToNextLowerJunctionLevelVoltage</field>
-<comment pinned="false" h="80" w="160">Move to next lower Junction level.</comment>
-</block>
-</value>
-</block>
-</statement>
-<value name="IF6">
 <block type="gamepad_getProperty_Boolean" id="S|v1;sfNh?lFDdop8r3F">
 <field name="IDENTIFIER">gamepad2</field>
 <field name="PROP">Y</field>
 <data>{"IDENTIFIER":"gamepad2"}</data>
 </block>
 </value>
-<statement name="DO6">
-<block type="telemetry_addTextData_All" id="w3/AY#4V`cw?_N5i(ATv">
-<value name="KEY">
-<shadow type="text" id="RwOJU~;V3dKG|lGtv_DC">
-<field name="TEXT">GamePad2 Start</field>
-</shadow>
-</value>
-<value name="TEXT">
-<shadow type="text" id="(S0tseX:k^y/A=b=)I*g">
-<field name="TEXT">Level 3 Requested</field>
-</shadow>
-</value>
-<next>
-<block type="variables_set" id="g@!X[v_f1|01n3ft%g?y">
-<field name="VAR" id="P(me_k,].S5tT((qG|Pp">booleanMovingToLiftTarget</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id=";^`_RjGEB]4ue^Hmd?-Q">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToLevelSpecified(int,boolean) boolean" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="boolean" color="255" heading="Move To Level Specified" comment="Move to level specified by button selected[Start,A,B,Y,Z] and whether grabber is closed." tooltip="Move to a level. Send -1 to check status if ready to stop." accessMethod="callJava_boolean" convertReturnValue="" argLabel0="Level Request" argType0="int" argAuto0="" argLabel1="Is Grabber Closed" argType1="boolean" argAuto1=""/>
+<statement name="DO2">
+<block type="misc_callJava_noReturn" id="!;}/Q^*qgNAu%=d-8QTf">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToLevelSpecified(int,boolean) void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="void" color="255" heading="Move To Level Specified" comment="Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed." tooltip="Move to a level. Send -1 to check status if ready to stop." accessMethod="callJava" convertReturnValue="" argLabel0="Level Request" argType0="int" argAuto0="" argLabel1="Is Grabber Closed" argType1="boolean" argAuto1=""/>
 <field name="CLASS_NAME">Lift</field>
 <field name="METHOD_NAME">moveToLevelSpecified</field>
-<comment pinned="false" h="80" w="160">Move to level specified by button selected[Start,A,B,Y,Z] and whether grabber is closed.</comment>
+<comment pinned="false" h="80" w="160">Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed.</comment>
 <value name="ARG0">
-<shadow type="math_number" id="=N!ddl//flJ+or5v?n,z">
+<shadow type="math_number" id="s3+vklXZ!M#ILQN){i,O">
 <field name="NUM">2</field>
 </shadow>
 </value>
 <value name="ARG1">
-<shadow type="logic_boolean" id="Wzews7;hp,0j~}l9U+C5">
+<shadow type="logic_boolean" id="8[hWm.4!=SJCB?3:bKd[">
 <field name="BOOL">FALSE</field>
 </shadow>
 <block type="misc_callJava_return" id="!d!749d`4Z4z=PUc_tVj">
@@ -438,164 +342,13 @@
 </block>
 </value>
 </block>
-</value>
-</block>
-</next>
-</block>
-</statement>
-<value name="IF7">
-<block type="logic_operation" id="Ox^MLYLbpH;kO)7U(Vwy">
-<field name="OP">OR</field>
-<value name="A">
-<block type="gamepad_getProperty_Boolean" id="g(|BzmRyZR]8?*D^Dq[z">
-<field name="IDENTIFIER">gamepad2</field>
-<field name="PROP">B</field>
-<data>{"IDENTIFIER":"gamepad2"}</data>
-</block>
-</value>
-<value name="B">
-<block type="gamepad_getProperty_Boolean" id="%=BhiC;(o6nH|QdYpk+g">
-<field name="IDENTIFIER">gamepad2</field>
-<field name="PROP">X</field>
-<data>{"IDENTIFIER":"gamepad2"}</data>
-</block>
-</value>
-</block>
-</value>
-<statement name="DO7">
-<block type="telemetry_addTextData_All" id="ErYgXS9/mU3CkJNl=6-A">
-<value name="KEY">
-<shadow type="text" id="iO/wk)+~.8jMSz:L8Ko~">
-<field name="TEXT">GamePad2 B / X</field>
-</shadow>
-</value>
-<value name="TEXT">
-<shadow type="text" id="37wQbni[VA_+pHh7!ix?">
-<field name="TEXT">Level 2 Requested</field>
-</shadow>
-</value>
-<next>
-<block type="variables_set" id="wmt*oqB*?$*3Zp=J$wyY">
-<field name="VAR" id="P(me_k,].S5tT((qG|Pp">booleanMovingToLiftTarget</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id="jTuIt3q[NIZo,c,IEQbe">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToLevelSpecified(int,boolean) boolean" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="boolean" color="255" heading="Move To Level Specified" comment="Move to level specified by button selected[Start,A,B,Y,Z] and whether grabber is closed." tooltip="Move to a level. Send -1 to check status if ready to stop." accessMethod="callJava_boolean" convertReturnValue="" argLabel0="Level Request" argType0="int" argAuto0="" argLabel1="Is Grabber Closed" argType1="boolean" argAuto1=""/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">moveToLevelSpecified</field>
-<comment pinned="false" h="80" w="160">Move to level specified by button selected[Start,A,B,Y,Z] and whether grabber is closed.</comment>
-<value name="ARG0">
-<shadow type="math_number" id="Z0yjSUSQ0e)@a41i9|*L">
-<field name="NUM">1</field>
-</shadow>
-</value>
-<value name="ARG1">
-<shadow type="logic_boolean">
-<field name="BOOL">FALSE</field>
-</shadow>
-<block type="misc_callJava_return" id="j%QzjO0raD3$Y)YN;gk^">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber isGrabberClosed() boolean" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="0" returnType="boolean" color="255" heading="Is Grabber Closed" comment="Returns whether the grabber is closed." tooltip="Returns a TRUE if grabber is closed." accessMethod="callJava_boolean" convertReturnValue=""/>
-<field name="CLASS_NAME">Grabber</field>
-<field name="METHOD_NAME">isGrabberClosed</field>
-<comment pinned="false" h="80" w="160">Returns whether the grabber is closed.</comment>
-</block>
-</value>
-</block>
-</value>
-</block>
-</next>
-</block>
-</statement>
-<value name="IF8">
-<block type="gamepad_getProperty_Boolean" id="Y2Wgrn_W.0@YNNCP8*-A">
-<field name="IDENTIFIER">gamepad2</field>
-<field name="PROP">A</field>
-<data>{"IDENTIFIER":"gamepad2"}</data>
-</block>
-</value>
-<statement name="DO8">
-<block type="telemetry_addTextData_All" id="DKZ(V+X)n^G*{8jHY(Mg">
-<value name="KEY">
-<shadow type="text" id="y3Hh:m[7c?(}3ZW.2MmO">
-<field name="TEXT">GamePad2 A</field>
-</shadow>
-</value>
-<value name="TEXT">
-<shadow type="text" id="9%kZ?wEJQ)Eu;(ts6[x;">
-<field name="TEXT">Level 1 Requested</field>
-</shadow>
-</value>
-<next>
-<block type="variables_set" id="=MXIja4^eeypS~RPoEf{">
-<field name="VAR" id="P(me_k,].S5tT((qG|Pp">booleanMovingToLiftTarget</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id="::fSWCVDBo:_3*x.I*3{">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToLevelSpecified(int,boolean) boolean" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="boolean" color="255" heading="Move To Level Specified" comment="Move to level specified by button selected[Start,A,B,Y,Z] and whether grabber is closed." tooltip="Move to a level. Send -1 to check status if ready to stop." accessMethod="callJava_boolean" convertReturnValue="" argLabel0="Level Request" argType0="int" argAuto0="" argLabel1="Is Grabber Closed" argType1="boolean" argAuto1=""/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">moveToLevelSpecified</field>
-<comment pinned="false" h="80" w="160">Move to level specified by button selected[Start,A,B,Y,Z] and whether grabber is closed.</comment>
-<value name="ARG0">
-<shadow type="math_number" id="L^TG@?[pVvV;N=(l6_}m">
-<field name="NUM">0</field>
-</shadow>
-</value>
-<value name="ARG1">
-<shadow type="logic_boolean">
-<field name="BOOL">FALSE</field>
-</shadow>
-<block type="misc_callJava_return" id=")(AjNQ_}:YdC7s~VG[aL">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber isGrabberClosed() boolean" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="0" returnType="boolean" color="255" heading="Is Grabber Closed" comment="Returns whether the grabber is closed." tooltip="Returns a TRUE if grabber is closed." accessMethod="callJava_boolean" convertReturnValue=""/>
-<field name="CLASS_NAME">Grabber</field>
-<field name="METHOD_NAME">isGrabberClosed</field>
-<comment pinned="false" h="80" w="160">Returns whether the grabber is closed.</comment>
-</block>
-</value>
-</block>
-</value>
-</block>
-</next>
-</block>
 </statement>
 <statement name="ELSE">
-<block type="controls_if" id="?~$$eGh./=kM^[C4Wu;e">
-<value name="IF0">
-<block type="logic_negate" id="~9Qx{$G^S~C{8l3rf]TQ">
-<value name="BOOL">
-<block type="misc_callJava_return" id="i#l=8W0T,-GRupPUMTh9">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift movingToTarget() boolean" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="boolean" color="255" heading="Determine Whether Moving To Target Lift Level" comment="Returns whether we are moving to a target lift level" tooltip="Returns whether we are moving to a target lift level" accessMethod="callJava_boolean" convertReturnValue=""/>
+<block type="misc_callJava_noReturn" id="ms)nmLOpNmX+^SWK#0dG">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift runLiftIteration() void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="void" color="255" heading="Run Lift Based on State" comment="Runs lift based on the state of lift." tooltip="States are changed by using the 'set' functions." accessMethod="callJava" convertReturnValue=""/>
 <field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">movingToTarget</field>
-<comment pinned="false" h="80" w="160">Returns whether we are moving to a target lift level</comment>
-</block>
-</value>
-</block>
-</value>
-<statement name="DO0">
-<block type="telemetry_addTextData_All" id="3hcENtP}g~EviQh.=gt|">
-<value name="KEY">
-<shadow type="text" id="ILtV`aHDU#1cL*i=eX5?">
-<field name="TEXT">Moving To Target</field>
-</shadow>
-</value>
-<value name="TEXT">
-<shadow type="text" id="@N(u,Sv.59NNdeT,;T0h">
-<field name="TEXT">TRUE</field>
-</shadow>
-</value>
-<next>
-<block type="variables_set" id="e;2LI(4.3=8gal3f_g(a">
-<field name="VAR" id="|{)9T-mP3T5eS7AMFo],">currentVoltage</field>
-<value name="VALUE">
-<block type="misc_callJava_return" id="0[+pg%Dwx+fjo~Y)q3.F">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift stopLiftMovement() double" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="double" color="255" heading="Stop Lift Movement" comment="Stop lift movement." tooltip="Stop lift movement." accessMethod="callJava_String" convertReturnValue="Number"/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">stopLiftMovement</field>
-<comment pinned="false" h="80" w="160">Stop lift movement.</comment>
-</block>
-</value>
-</block>
-</next>
-</block>
-</statement>
+<field name="METHOD_NAME">runLiftIteration</field>
+<comment pinned="false" h="80" w="160">Runs lift based on the state of lift.</comment>
 </block>
 </statement>
 <next>
