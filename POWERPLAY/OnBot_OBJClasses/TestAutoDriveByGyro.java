@@ -187,7 +187,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         driveRightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
         driveRightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        driveLeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveLeftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Wait for the game to start (Display Gyro value while waiting)
         while (opModeInInit()) {
