@@ -1,9 +1,6 @@
 <xml xmlns="https://developers.google.com/blockly/xml">
 <variables>
 <variable id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</variable>
-<variable id="W+[-0JTv*bj3)Hs1i)nW">distanceToPickupCone</variable>
-<variable id="BHnd$^2p={)ZHA910=Gw">distanceGoodToJunction</variable>
-<variable id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</variable>
 <variable id="%P|YjQB8X]z^B`-VMciK">curPowerLevel</variable>
 <variable id="[SS55+EMQZ=Wu}XZ*m{:">drivetrainMoving</variable>
 </variables>
@@ -20,40 +17,6 @@
 <block type="math_number" id=".!@~/_7~mX1aPFQ9mJvF">
 <field name="NUM">0.5</field>
 </block>
-</value>
-<next>
-<block type="variables_set" id="hqvMg?=BhTkJCp@#Ja]{">
-<field name="VAR" id="W+[-0JTv*bj3)Hs1i)nW">distanceToPickupCone</field>
-<value name="VALUE">
-<block type="math_number" id="]w:jn1#Au*R_@C`Hs@{:">
-<field name="NUM">30</field>
-</block>
-</value>
-<next>
-<block type="variables_set" id="9NV[Ol#wM.4)24j=8hyT">
-<field name="VAR" id="BHnd$^2p={)ZHA910=Gw">distanceGoodToJunction</field>
-<value name="VALUE">
-<block type="math_number" id="A=DomW/$b{--8*UYI)=q">
-<field name="NUM">50</field>
-</block>
-</value>
-<next>
-<block type="led_enableLed_Boolean" id="DyDU[RB7NbWncTcyujE*">
-<field name="IDENTIFIER">greenLEDAsLED</field>
-<data>{"IDENTIFIER":"greenLED"}</data>
-<value name="ENABLE">
-<shadow type="logic_boolean" id="m9Tb}:-d0Od2jb?,nSf`">
-<field name="BOOL">FALSE</field>
-</shadow>
-</value>
-<next>
-<block type="led_enableLed_Boolean" id="OfDWiprzOQz?x4DP8y@5">
-<field name="IDENTIFIER">redLEDAsLED</field>
-<data>{"IDENTIFIER":"redLED"}</data>
-<value name="ENABLE">
-<shadow type="logic_boolean" id="m9qfr!nFJBH5*]*$?Px9">
-<field name="BOOL">FALSE</field>
-</shadow>
 </value>
 <next>
 <block type="comment" id="g-tCI?=Y$Bpr*r{oE_4Z">
@@ -85,35 +48,6 @@
 </shadow>
 </value>
 <next>
-<block type="variables_set" id="0bo^2b.3:xZQv%Qa7SRO">
-<field name="VAR" id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</field>
-<value name="VALUE">
-<block type="distanceSensor_getDistance" id="%~1JlztxI[Drt4jX99hT">
-<field name="IDENTIFIER">sensor2MDistanceAsDistanceSensor</field>
-<data>{"IDENTIFIER":"sensor2MDistance"}</data>
-<value name="DISTANCE_UNIT">
-<shadow type="navigation_typedEnum_distanceUnit" id="[jV;=/%e[!/XKO1@|FUR">
-<field name="DISTANCE_UNIT">MM</field>
-</shadow>
-</value>
-</block>
-</value>
-<next>
-<block type="telemetry_addNumericData_Number" id="udJ=aGR6[B7wve]}OQ.!">
-<value name="KEY">
-<shadow type="text" id="Ebcfj[wwc{WxM2OL;R;6">
-<field name="TEXT">Distance of Object to Back of Grabber</field>
-</shadow>
-</value>
-<value name="NUMBER">
-<shadow type="math_number" id="1NQf~CtQXZco/1Kzcq$Q">
-<field name="NUM">123</field>
-</shadow>
-<block type="variables_get" id="i?=Xwei.qg$o$HIg+ksa">
-<field name="VAR" id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</field>
-</block>
-</value>
-<next>
 <block type="variables_set" id="Rn{(okt/;#)L@5JbZp`d">
 <field name="VAR" id="%P|YjQB8X]z^B`-VMciK">curPowerLevel</field>
 <value name="VALUE">
@@ -133,30 +67,50 @@
 </block>
 </value>
 <next>
-<block type="misc_callJava_noReturn" id="3)X/:oo~FZpVX+K3_/#f">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber initGrabber(java.lang.String) void" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="1" returnType="void" color="255" heading="Grabber" comment="Initialize variables for our grabber." tooltip="Initialize variables for our grabber." accessMethod="callJava" convertReturnValue="" argLabel0="Grabber Servo Name" argType0="java.lang.String" argAuto0=""/>
+<block type="misc_callJava_noReturn" id="W8@8Qs.OICM9P@+3AB-`">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber initGrabber(java.lang.String,java.lang.String,java.lang.String,java.lang.String) void" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="4" returnType="void" color="255" heading="Grabber" comment="Initialize variables for our grabber." tooltip="Initialize variables for our grabber." accessMethod="callJava" convertReturnValue="" argLabel0="Grabber Servo Name" argType0="java.lang.String" argAuto0="" argLabel1="2M Distance Sensor Name" argType1="java.lang.String" argAuto1="" argLabel2="Green LED Name" argType2="java.lang.String" argAuto2="" argLabel3="Red LED Name" argType3="java.lang.String" argAuto3=""/>
 <field name="CLASS_NAME">Grabber</field>
 <field name="METHOD_NAME">initGrabber</field>
 <comment pinned="false" h="80" w="160">Initialize variables for our grabber.</comment>
 <value name="ARG0">
-<shadow type="text" id="mQ_|1v2;hhTLqJ-3uPxx">
+<shadow type="text" id="oS:LI@.U/J#H#KQP86m1">
 <field name="TEXT">servoGrabber</field>
 </shadow>
 </value>
+<value name="ARG1">
+<shadow type="text" id="7cymLA,-TNAxEBBCLaa3">
+<field name="TEXT">sensor2MDistance</field>
+</shadow>
+</value>
+<value name="ARG2">
+<shadow type="text" id="z/cQQl@MY1N[wze{+V$y">
+<field name="TEXT">greenLED</field>
+</shadow>
+</value>
+<value name="ARG3">
+<shadow type="text" id=":b5?-HK~91`KS$t.!U4:">
+<field name="TEXT">redLED</field>
+</shadow>
+</value>
 <next>
-<block type="misc_callJava_noReturn" id="0u!XhfXS%0J@vM9?kU+,">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift initLift(java.lang.String,java.lang.String) void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="void" color="255" heading="Initialize Lift" comment="Initialization of lift and variables." tooltip="Initialization of lift and variables." accessMethod="callJava" convertReturnValue="" argLabel0="Lift Motor Name" argType0="java.lang.String" argAuto0="" argLabel1="Lift Analog Sensor Name" argType1="java.lang.String" argAuto1=""/>
+<block type="misc_callJava_noReturn" id="X?[!NH.2+uux3c,1i`O3">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift initLift(java.lang.String,java.lang.String,java.lang.String) void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="3" returnType="void" color="255" heading="Initialize Lift" comment="Initialization of lift and variables." tooltip="Initialization of lift and variables." accessMethod="callJava" convertReturnValue="" argLabel0="Lift Motor Name" argType0="java.lang.String" argAuto0="" argLabel1="Lift Analog Sensor Name" argType1="java.lang.String" argAuto1="" argLabel2="Sensor At Lift Bottom Name" argType2="java.lang.String" argAuto2=""/>
 <field name="CLASS_NAME">Lift</field>
 <field name="METHOD_NAME">initLift</field>
 <comment pinned="false" h="80" w="160">Initialization of lift and variables.</comment>
 <value name="ARG0">
-<shadow type="text" id="f49;EiUU-r}?f,Jf,C*_">
+<shadow type="text" id="sk$5=t]ep+_KJLy//2`|">
 <field name="TEXT">servoLift</field>
 </shadow>
 </value>
 <value name="ARG1">
-<shadow type="text" id="#W%{(O%8,W-n9b:BJ/DM">
+<shadow type="text" id="w#Mj+)@9CSQjBr)t|2s~">
 <field name="TEXT">liftVoltage</field>
+</shadow>
+</value>
+<value name="ARG2">
+<shadow type="text" id=")6)-Su^#$TY6)_ll(=rq">
+<field name="TEXT">sensor2MDistance</field>
 </shadow>
 </value>
 <next>
@@ -184,120 +138,14 @@
 <block type="linearOpMode_opModeIsActive" id="B*pFK1@PI_JqfeALPI`M"/>
 </value>
 <statement name="DO">
-<block type="variables_set" id="H{OegU-pRa$t0Y?zC#o=">
-<field name="VAR" id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</field>
-<value name="VALUE">
-<block type="distanceSensor_getDistance" id="hrDv`ZGaJcZpEy**?hD4">
-<field name="IDENTIFIER">sensor2MDistanceAsDistanceSensor</field>
-<data>{"IDENTIFIER":"sensor2MDistance"}</data>
-<value name="DISTANCE_UNIT">
-<shadow type="navigation_typedEnum_distanceUnit" id="r_Rug8W)(O!vZ?qO~YV2">
-<field name="DISTANCE_UNIT">MM</field>
-</shadow>
-</value>
-</block>
-</value>
-<next>
-<block type="telemetry_addNumericData_Number" id="f/h/kg/t6^8x#pBmx3PP">
-<value name="KEY">
-<shadow type="text" id="xk+v(}`I|-dX(|gzl3w0">
-<field name="TEXT">Distance of Object to Back of Grabber</field>
-</shadow>
-</value>
-<value name="NUMBER">
-<shadow type="math_number">
-<field name="NUM">123</field>
-</shadow>
-<block type="variables_get" id=")R8Y,Q8;)tcP0]4Ak/Xs">
-<field name="VAR" id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</field>
-</block>
-</value>
-<next>
 <block type="comment" id="4_:hECUzpH]H|1%k}$W#">
 <field name="COMMENT">Check distance for LED change</field>
-<next>
-<block type="controls_if" id="*GVf7?uEy{%5H]22`Dvr">
-<mutation elseif="1" else="1"/>
-<value name="IF0">
-<block type="logic_compare" id="1!}Qy/B3G:g:!-|z=[Iu">
-<field name="OP">LTE</field>
-<value name="A">
-<block type="variables_get" id="5ly%Iq+FOYJ%4-9Qq-rS">
-<field name="VAR" id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</field>
-</block>
-</value>
-<value name="B">
-<block type="variables_get" id="@FigXbEhS`L(??_?I2fi">
-<field name="VAR" id="W+[-0JTv*bj3)Hs1i)nW">distanceToPickupCone</field>
-</block>
-</value>
-</block>
-</value>
-<statement name="DO0">
-<block type="led_enableLed_Boolean" id="fD0}4eiN0|K!s`D_DvkO">
-<field name="IDENTIFIER">greenLEDAsLED</field>
-<data>{"IDENTIFIER":"greenLED"}</data>
-<value name="ENABLE">
-<shadow type="logic_boolean" id="JqPT4Q%*qEhvW:/@NX0_">
-<field name="BOOL">TRUE</field>
-</shadow>
-</value>
-</block>
-</statement>
-<value name="IF1">
-<block type="logic_compare" id="*~tsclDl]qQ2nNME3:^~">
-<field name="OP">LTE</field>
-<value name="A">
-<block type="variables_get" id="kcv~u[u^U`aPBh~nJ)m/">
-<field name="VAR" id="^S_ME/Ls/G,*7Gdk]KFW">distanceObjectToBackOfGrabber</field>
-</block>
-</value>
-<value name="B">
-<block type="variables_get" id="z]EF6^0KO9}$%Y!+Pg?{">
-<field name="VAR" id="BHnd$^2p={)ZHA910=Gw">distanceGoodToJunction</field>
-</block>
-</value>
-</block>
-</value>
-<statement name="DO1">
-<block type="led_enableLed_Boolean" id="#,eed}+%JWVv^7.GCjr!">
-<field name="IDENTIFIER">redLEDAsLED</field>
-<data>{"IDENTIFIER":"redLED"}</data>
-<value name="ENABLE">
-<shadow type="logic_boolean" id="gkZ4fkHnG!4GcD,ti)Lq">
-<field name="BOOL">TRUE</field>
-</shadow>
-</value>
-</block>
-</statement>
-<statement name="ELSE">
-<block type="led_enableLed_Boolean" id="FraKry$M+Y{k+n-{mKp]">
-<field name="IDENTIFIER">greenLEDAsLED</field>
-<data>{"IDENTIFIER":"greenLED"}</data>
-<value name="ENABLE">
-<shadow type="logic_boolean" id=".eUyM+90FnI1.s{_J%1Z">
-<field name="BOOL">FALSE</field>
-</shadow>
-</value>
-<next>
-<block type="led_enableLed_Boolean" id="-Pg7IC5+hEvT4Nd.Wi$g">
-<field name="IDENTIFIER">redLEDAsLED</field>
-<data>{"IDENTIFIER":"redLED"}</data>
-<value name="ENABLE">
-<shadow type="logic_boolean" id="`uP3PS(3jBlvyZzYF=i(">
-<field name="BOOL">FALSE</field>
-</shadow>
-</value>
-</block>
-</next>
-</block>
-</statement>
 <next>
 <block type="comment" id="v[ihxH6dE?E[K30o=@,2">
 <field name="COMMENT">Check for grabber requests</field>
 <next>
 <block type="controls_if" id="c1s;~(3($2y/{aiSH2EA">
-<mutation elseif="1"/>
+<mutation elseif="1" else="1"/>
 <value name="IF0">
 <block type="gamepad_getProperty_Boolean" id="!9E[G-dk:@EA.(;2|{m5">
 <field name="IDENTIFIER">gamepad1</field>
@@ -356,39 +204,25 @@
 </next>
 </block>
 </statement>
+<statement name="ELSE">
+<block type="misc_callJava_noReturn" id="eb,E(ZTy*Z~mUXgS29,2" disabled="true">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber runGrabber() void" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="0" returnType="void" color="255" heading="Run Grabber Based on State" comment="Runs grabber based on its state." tooltip="States are changed by distance sensor." accessMethod="callJava" convertReturnValue=""/>
+<field name="CLASS_NAME">Grabber</field>
+<field name="METHOD_NAME">runGrabber</field>
+<comment pinned="false" h="80" w="160">Runs grabber based on its state.</comment>
+</block>
+</statement>
 <next>
 <block type="comment" id="f*~BN[hMc=qkF9C6Yimf">
 <field name="COMMENT">Check for lift requests</field>
 <next>
-<block type="controls_if" id="e-5_R*VM8)!pp3~x21fl">
-<mutation elseif="5" else="1"/>
+<block type="controls_if" id="e-5_R*VM8)!pp3~x21fl" disabled="true">
+<mutation elseif="3" else="1"/>
 <value name="IF0">
-<block type="logic_operation" id="mhOUGftf`_?.=w`(yrIR">
-<field name="OP">AND</field>
-<value name="A">
-<block type="gamepad_getProperty_Boolean" id="FU^4M.Y3/MQE?=?jPI3D">
+<block type="gamepad_getProperty_Boolean" id="jS^?$e;PIaY/{9b4Yw=n">
 <field name="IDENTIFIER">gamepad1</field>
-<field name="PROP">RightBumper</field>
+<field name="PROP">X</field>
 <data>{"IDENTIFIER":"gamepad1"}</data>
-</block>
-</value>
-<value name="B">
-<block type="logic_compare" id="D:{!8r{~[7!^tJ5Ai=$l">
-<field name="OP">GT</field>
-<value name="A">
-<block type="gamepad_getProperty_Number" id="3K|nIpO(b]3HK^5a()y4">
-<field name="IDENTIFIER">gamepad1</field>
-<field name="PROP">RightTrigger</field>
-<data>{"IDENTIFIER":"gamepad1"}</data>
-</block>
-</value>
-<value name="B">
-<block type="variables_get" id=".[+X.`c!:=nN@mVw`]Ie">
-<field name="VAR" id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</field>
-</block>
-</value>
-</block>
-</value>
 </block>
 </value>
 <statement name="DO0">
@@ -400,81 +234,13 @@
 </block>
 </statement>
 <value name="IF1">
-<block type="gamepad_getProperty_Boolean" id="Y4l|6cz~|^Q$mch-nohQ">
-<field name="IDENTIFIER">gamepad1</field>
-<field name="PROP">RightBumper</field>
-<data>{"IDENTIFIER":"gamepad1"}</data>
-</block>
-</value>
-<statement name="DO1">
-<block type="misc_callJava_noReturn" id="5xs!GQ8$cbX+`4JoCq)*">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToNextHigherJunctionLevelVoltage() void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="void" color="255" heading="Move To Next Higher Junction Level" comment="Move to next higher Junction level." tooltip="Move to next higher Junction level." accessMethod="callJava" convertReturnValue=""/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">moveToNextHigherJunctionLevelVoltage</field>
-<comment pinned="false" h="80" w="160">Move to next higher Junction level.</comment>
-<next>
-<block type="telemetry_addTextData_All" id="yCUq9~}3-nV@`euC}7i!">
-<value name="KEY">
-<shadow type="text" id="WT+ILXbcGCn+%UU8o:-S">
-<field name="TEXT">LIFT</field>
-</shadow>
-</value>
-<value name="TEXT">
-<shadow type="text" id="%~9XyH;$3W=Y~RI[=(!4">
-<field name="TEXT">Moving to HIGHER Junction</field>
-</shadow>
-</value>
-</block>
-</next>
-</block>
-</statement>
-<value name="IF2">
-<block type="logic_compare" id="o-jpfzxG`u4aAAWz0elc">
-<field name="OP">GT</field>
-<value name="A">
-<block type="gamepad_getProperty_Number" id="`8fL_0X[EW4U~,Xyds|t">
-<field name="IDENTIFIER">gamepad1</field>
-<field name="PROP">RightTrigger</field>
-<data>{"IDENTIFIER":"gamepad1"}</data>
-</block>
-</value>
-<value name="B">
-<block type="variables_get" id="~)au,Qx}6fJ!=5@0.8N*">
-<field name="VAR" id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</field>
-</block>
-</value>
-</block>
-</value>
-<statement name="DO2">
-<block type="misc_callJava_noReturn" id="S(Zk}fbfVXB/%2W.tnzK">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToNextLowerJunctionLevelVoltage() void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="0" returnType="void" color="255" heading="Move To Next Lower Junction Level" comment="Move to next lower Junction level." tooltip="Move to next lower Junction level." accessMethod="callJava" convertReturnValue=""/>
-<field name="CLASS_NAME">Lift</field>
-<field name="METHOD_NAME">moveToNextLowerJunctionLevelVoltage</field>
-<comment pinned="false" h="80" w="160">Move to next lower Junction level.</comment>
-<next>
-<block type="telemetry_addTextData_All" id="^eEkKa(v@+h%5563S:3_">
-<value name="KEY">
-<shadow type="text" id="E[*Si@P1S{;fDGlo$9K`">
-<field name="TEXT">LIFT</field>
-</shadow>
-</value>
-<value name="TEXT">
-<shadow type="text" id="wd_jo$~!Wki%pHKnb_nv">
-<field name="TEXT">Moving to LOWER Junction</field>
-</shadow>
-</value>
-</block>
-</next>
-</block>
-</statement>
-<value name="IF3">
 <block type="gamepad_getProperty_Boolean" id="*iQE4Rd#;56|Q)Y1bn2j">
 <field name="IDENTIFIER">gamepad1</field>
 <field name="PROP">A</field>
 <data>{"IDENTIFIER":"gamepad1"}</data>
 </block>
 </value>
-<statement name="DO3">
+<statement name="DO1">
 <block type="misc_callJava_noReturn" id="]ganM@*Z:qSZdo-`__.D">
 <mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToLevelSpecified(int,boolean) void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="void" color="255" heading="Move To Level Specified" comment="Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed." tooltip="Move to a level. Send -1 to check status if ready to stop." accessMethod="callJava" convertReturnValue="" argLabel0="Level Request" argType0="int" argAuto0="" argLabel1="Is Grabber Closed" argType1="boolean" argAuto1=""/>
 <field name="CLASS_NAME">Lift</field>
@@ -498,14 +264,14 @@
 </value>
 </block>
 </statement>
-<value name="IF4">
+<value name="IF2">
 <block type="gamepad_getProperty_Boolean" id="$SoF~pVZWck;jlGF:vg1">
 <field name="IDENTIFIER">gamepad1</field>
 <field name="PROP">B</field>
 <data>{"IDENTIFIER":"gamepad1"}</data>
 </block>
 </value>
-<statement name="DO4">
+<statement name="DO2">
 <block type="misc_callJava_noReturn" id=".E*1PnyiT%YSXJ1~wC)H">
 <mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToLevelSpecified(int,boolean) void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="void" color="255" heading="Move To Level Specified" comment="Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed." tooltip="Move to a level. Send -1 to check status if ready to stop." accessMethod="callJava" convertReturnValue="" argLabel0="Level Request" argType0="int" argAuto0="" argLabel1="Is Grabber Closed" argType1="boolean" argAuto1=""/>
 <field name="CLASS_NAME">Lift</field>
@@ -529,14 +295,14 @@
 </value>
 </block>
 </statement>
-<value name="IF5">
+<value name="IF3">
 <block type="gamepad_getProperty_Boolean" id="@fEJw2j)a#zO8WGGSxdg">
 <field name="IDENTIFIER">gamepad1</field>
 <field name="PROP">Y</field>
 <data>{"IDENTIFIER":"gamepad1"}</data>
 </block>
 </value>
-<statement name="DO5">
+<statement name="DO3">
 <block type="misc_callJava_noReturn" id="H7ke5#4$Ai9;cvKdedy8">
 <mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Lift moveToLevelSpecified(int,boolean) void" fullClassName="org.firstinspires.ftc.teamcode.Lift" simpleName="Lift" parameterCount="2" returnType="void" color="255" heading="Move To Level Specified" comment="Move to level[0,1,2] specified by button selected[A, B/X, Y] and whether grabber is closed." tooltip="Move to a level. Send -1 to check status if ready to stop." accessMethod="callJava" convertReturnValue="" argLabel0="Level Request" argType0="int" argAuto0="" argLabel1="Is Grabber Closed" argType1="boolean" argAuto1=""/>
 <field name="CLASS_NAME">Lift</field>
@@ -587,12 +353,30 @@
 <field name="COMMENT">Check for drivetrain requests</field>
 <next>
 <block type="controls_if" id="H#SmzZlR`iAv86X|V!E{">
-<mutation elseif="7" else="1"/>
+<mutation elseif="11" else="1"/>
 <value name="IF0">
-<block type="gamepad_getProperty_Boolean" id="H9oCQ#?W5JoN(t;*h-5l">
+<block type="logic_compare" id="oh2HBNWHF{uV(0.)qIgU">
+<field name="OP">LT</field>
+<value name="A">
+<block type="gamepad_getProperty_Number" id="y)9,3N?JZ/Bezd1CrxPM">
 <field name="IDENTIFIER">gamepad1</field>
-<field name="PROP">DpadUp</field>
+<field name="PROP">LeftStickY</field>
 <data>{"IDENTIFIER":"gamepad1"}</data>
+</block>
+</value>
+<value name="B">
+<block type="math_single" id="oUmOH:^!W4ud`4P5Q6.|">
+<field name="OP">NEG</field>
+<value name="NUM">
+<shadow type="math_number">
+<field name="NUM">9</field>
+</shadow>
+<block type="variables_get" id="spG;NOsV-Zl-@zWv;h$~">
+<field name="VAR" id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</field>
+</block>
+</value>
+</block>
+</value>
 </block>
 </value>
 <statement name="DO0">
@@ -628,10 +412,20 @@
 </block>
 </statement>
 <value name="IF1">
-<block type="gamepad_getProperty_Boolean" id="idDytp$wbe9c1a;rLb{R">
+<block type="logic_compare" id="#B.#m?Rx;Ei/f/.A4O=:">
+<field name="OP">GT</field>
+<value name="A">
+<block type="gamepad_getProperty_Number" id="CcwbXf~?.=y6Cgo*KNkS">
 <field name="IDENTIFIER">gamepad1</field>
-<field name="PROP">DpadDown</field>
+<field name="PROP">LeftStickY</field>
 <data>{"IDENTIFIER":"gamepad1"}</data>
+</block>
+</value>
+<value name="B">
+<block type="variables_get" id="dLqEm5g+JL5I1u.L4uI7">
+<field name="VAR" id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</field>
+</block>
+</value>
 </block>
 </value>
 <statement name="DO1">
@@ -667,10 +461,20 @@
 </block>
 </statement>
 <value name="IF2">
-<block type="gamepad_getProperty_Boolean" id="S^;7}A*uAyNNV`!IPE(U">
+<block type="logic_compare" id="W*X99{LYFPY9XDLz6:-Z">
+<field name="OP">GT</field>
+<value name="A">
+<block type="gamepad_getProperty_Number" id="cKEp4O(,kfI;)ub)Bi^1">
 <field name="IDENTIFIER">gamepad1</field>
-<field name="PROP">DpadRight</field>
+<field name="PROP">LeftStickX</field>
 <data>{"IDENTIFIER":"gamepad1"}</data>
+</block>
+</value>
+<value name="B">
+<block type="variables_get" id="$i?/wZ/I},TaopW|96Z#">
+<field name="VAR" id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</field>
+</block>
+</value>
 </block>
 </value>
 <statement name="DO2">
@@ -706,10 +510,28 @@
 </block>
 </statement>
 <value name="IF3">
-<block type="gamepad_getProperty_Boolean" id="|+TE,!I7-3N}H]NjWDN^">
+<block type="logic_compare" id="gVzU/`Fqk)O-}+)WDty5">
+<field name="OP">LT</field>
+<value name="A">
+<block type="gamepad_getProperty_Number" id="|}2D|.tEy,jd|Cwc{,f)">
 <field name="IDENTIFIER">gamepad1</field>
-<field name="PROP">DpadLeft</field>
+<field name="PROP">LeftStickX</field>
 <data>{"IDENTIFIER":"gamepad1"}</data>
+</block>
+</value>
+<value name="B">
+<block type="math_single" id="n[v{1xU2g|nL.yedi-DF">
+<field name="OP">NEG</field>
+<value name="NUM">
+<shadow type="math_number">
+<field name="NUM">9</field>
+</shadow>
+<block type="variables_get" id="P@r]!C!8UBjSs*+`7$8b">
+<field name="VAR" id="F1y.EaF*Pr$6R;_=nQ;4">triggerThreshold</field>
+</block>
+</value>
+</block>
+</value>
 </block>
 </value>
 <statement name="DO3">
@@ -938,6 +760,66 @@
 </next>
 </block>
 </statement>
+<value name="IF8">
+<block type="gamepad_getProperty_Boolean" id="|+TE,!I7-3N}H]NjWDN^">
+<field name="IDENTIFIER">gamepad1</field>
+<field name="PROP">DpadLeft</field>
+<data>{"IDENTIFIER":"gamepad1"}</data>
+</block>
+</value>
+<statement name="DO8">
+<block type="misc_callJava_noReturn" id="Iyhi2rI=9Fg}B3cECCZ1">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanum setDriveToXConfig() void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanum" simpleName="DrivetrainMecanum" parameterCount="0" returnType="void" color="255" heading="Drivetrain: Configurations" comment="Set drive to X Config." tooltip="Set drive to X Config." accessMethod="callJava" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanum</field>
+<field name="METHOD_NAME">setDriveToXConfig</field>
+<comment pinned="false" h="80" w="160">Set drive to X Config.</comment>
+</block>
+</statement>
+<value name="IF9">
+<block type="gamepad_getProperty_Boolean" id="H9oCQ#?W5JoN(t;*h-5l">
+<field name="IDENTIFIER">gamepad1</field>
+<field name="PROP">DpadUp</field>
+<data>{"IDENTIFIER":"gamepad1"}</data>
+</block>
+</value>
+<statement name="DO9">
+<block type="misc_callJava_noReturn" id="S{3Fate~-m$E.,Rm0%dq">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanum setDriveToYConfig() void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanum" simpleName="DrivetrainMecanum" parameterCount="0" returnType="void" color="255" heading="Drivetrain: Configurations" comment="Set drive to Y Config." tooltip="Set drive to Y Config." accessMethod="callJava" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanum</field>
+<field name="METHOD_NAME">setDriveToYConfig</field>
+<comment pinned="false" h="80" w="160">Set drive to Y Config.</comment>
+</block>
+</statement>
+<value name="IF10">
+<block type="gamepad_getProperty_Boolean" id="S^;7}A*uAyNNV`!IPE(U">
+<field name="IDENTIFIER">gamepad1</field>
+<field name="PROP">DpadRight</field>
+<data>{"IDENTIFIER":"gamepad1"}</data>
+</block>
+</value>
+<statement name="DO10">
+<block type="misc_callJava_noReturn" id="s[D,f~cp63rc8FqQWvjg">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanum setDriveToBConfig() void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanum" simpleName="DrivetrainMecanum" parameterCount="0" returnType="void" color="255" heading="Drivetrain: Configurations" comment="Set drive to B Config." tooltip="Set drive to B Config." accessMethod="callJava" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanum</field>
+<field name="METHOD_NAME">setDriveToBConfig</field>
+<comment pinned="false" h="80" w="160">Set drive to B Config.</comment>
+</block>
+</statement>
+<value name="IF11">
+<block type="gamepad_getProperty_Boolean" id="idDytp$wbe9c1a;rLb{R">
+<field name="IDENTIFIER">gamepad1</field>
+<field name="PROP">DpadDown</field>
+<data>{"IDENTIFIER":"gamepad1"}</data>
+</block>
+</value>
+<statement name="DO11">
+<block type="misc_callJava_noReturn" id="/_)zOscB9p+:~a}lg24A">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanum setDriveToAConfig() void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanum" simpleName="DrivetrainMecanum" parameterCount="0" returnType="void" color="255" heading="Drivetrain: Configurations" comment="Set drive to A Config." tooltip="Set drive to A Config." accessMethod="callJava" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanum</field>
+<field name="METHOD_NAME">setDriveToAConfig</field>
+<comment pinned="false" h="80" w="160">Set drive to A Config.</comment>
+</block>
+</statement>
 <statement name="ELSE">
 <block type="telemetry_addTextData_All" id="]v1T=$J;%_wKZV8:UdsH">
 <value name="KEY">
@@ -964,14 +846,6 @@
 <field name="BOOL">FALSE</field>
 </block>
 </value>
-<next>
-<block type="misc_callJava_noReturn" id="VQ3R(gZhTqs:w9{I1z5*">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanum setDriveToBConfig() void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanum" simpleName="DrivetrainMecanum" parameterCount="0" returnType="void" color="255" heading="Drivetrain: Configurations" comment="Set drive to B Config." tooltip="Set drive to B Config." accessMethod="callJava" convertReturnValue=""/>
-<field name="CLASS_NAME">DrivetrainMecanum</field>
-<field name="METHOD_NAME">setDriveToBConfig</field>
-<comment pinned="false" h="80" w="160">Set drive to B Config.</comment>
-</block>
-</next>
 </block>
 </next>
 </block>
@@ -1031,12 +905,6 @@
 </block>
 </next>
 </block>
-</next>
-</block>
-</next>
-</block>
-</next>
-</block>
 </statement>
 </block>
 </next>
@@ -1044,18 +912,6 @@
 </next>
 </block>
 </statement>
-</block>
-</next>
-</block>
-</next>
-</block>
-</next>
-</block>
-</next>
-</block>
-</next>
-</block>
-</next>
 </block>
 </next>
 </block>

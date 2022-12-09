@@ -23,8 +23,8 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     
     // Initialize our speed levels
     // powerLevel: Range 0-1.00
-    static double[] powerLevel = {0.25, 0.50};
-    static double powerThreshold = 0.20;
+    static double[] powerLevel = {0.20, 0.50, 0.70};
+    static double powerThreshold = 0.15;
     static double turningPowerLevel = 0.25;
 
     // Initialize our current power / speed to zero
