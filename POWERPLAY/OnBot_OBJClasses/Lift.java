@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
+import com.qualcomm.robotcore.hardware.LED;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.ExportToBlocks;
 import org.firstinspires.ftc.robotcore.external.State;
@@ -15,6 +18,10 @@ public class Lift extends BlocksOpModeCompanion {
 
   static AnalogInput liftVoltage;
   static Servo servoLift;
+  
+  private static DistanceSensor sensor2MDistance;
+  static int distanceMinToBlockLower = 125;
+  static double curDistanceObjectToBackOfGrabber = 0;
 
   // Java class variables for detecting & controlling lift range
   static double voltageLowest = 0.45;  // 0.45  // static variables defined across java class
@@ -61,14 +68,15 @@ public class Lift extends BlocksOpModeCompanion {
   
   static State liftState;
   
-  
-  //=======================================================================
+//====================================================================================  
+//======================== CLASS METHODS =============================================
+//====================================================================================
 
   @ExportToBlocks (
     heading = "Run Lift Based on State",
     color = 255,
     comment = "Runs lift based on the state of lift.",
-    tooltip = "States are changed by using the 'set' functions."
+    tooltip = "States are changed by using setting a target level."
   )
   /**
    * Runs an interation of the lift based on it's current state
@@ -78,6 +86,10 @@ public class Lift extends BlocksOpModeCompanion {
     
     // Get our lastest voltage (aka lift position)
     currentVoltage = liftVoltage.getVoltage();
+
+    // Grab the latest distance reading at the bottom of the lift to see if anything there
+    curDistanceObjectToBackOfGrabber = sensor2MDistance.getDistance(DistanceUnit.MM);
+    telemetry.addData("Distance Read", curDistanceObjectToBackOfGrabber);
  
     switch (liftState) {
       
@@ -87,16 +99,23 @@ public class Lift extends BlocksOpModeCompanion {
 
       case LOWER_LIFT: {
         // Move down until able to reach our targetLevel or lowest limit
-        if (currentVoltage > voltageLowest && targetLevel < currentVoltage) {
+		
+        // DO NOT LOWER LIFT IF SOMETHING IN THE GRABBER'S PATH
+        if (curDistanceObjectToBackOfGrabber < distanceMinToBlockLower) {
+          stopLiftMovement();               
+          liftState = State.STOP_LIFT;
+		  
+		} if (currentVoltage > voltageLowest && targetLevel < currentVoltage) {
 
-        // Initiate moving down to target
-        servoLift.setPosition(liftPowerScaledMoveDown);
+          // Initiate moving down to target
+          servoLift.setPosition(liftPowerScaledMoveDown);
         
-        telemetry.addData("Lift Movement: ", "DOWN");
-        telemetry.addData("Lift Target Level: ", targetLevel);
-        telemetry.addData("Lift Current Voltage: ", currentVoltage);
+          telemetry.addData("Lift Movement: ", "DOWN");
+          telemetry.addData("Lift Target Level: ", targetLevel);
+          telemetry.addData("Lift Current Voltage: ", currentVoltage);
 
         } else {
+			
           stopLiftMovement();               
           liftState = State.STOP_LIFT;
         }
@@ -147,12 +166,12 @@ public class Lift extends BlocksOpModeCompanion {
     color = 255,
     comment = "Initialization of lift and variables.",
     tooltip = "Initialization of lift and variables.",
-    parameterLabels = {"Lift Motor Name", "Lift Analog Sensor Name"}
+    parameterLabels = {"Lift Motor Name", "Lift Analog Sensor Name", "Sensor At Lift Bottom Name"}
   )
   /**
    * Initialization of lift and variables
    */
-  public static void initLift(String liftMotorName, String liftAnalogSensorName) {
+  public static void initLift(String liftMotorName, String liftAnalogSensorName, String sensor2MDistanceName) {
     
     liftState = State.START;
 
@@ -163,6 +182,14 @@ public class Lift extends BlocksOpModeCompanion {
  
     telemetry.addData("Lowest voltage", Double.parseDouble(JavaUtil.formatNumber(voltageLowest, 2)));
     telemetry.addData("Highest voltage", Double.parseDouble(JavaUtil.formatNumber(voltageHighest, 2)));
+    
+    // Let's get a hardware handle on our distance sensor at the bottom of our lift
+    sensor2MDistance = hardwareMap.get(DistanceSensor.class, sensor2MDistanceName);
+	
+    // Grab the current distance reading 
+    curDistanceObjectToBackOfGrabber = sensor2MDistance.getDistance(DistanceUnit.MM);
+    telemetry.addData("Distance Read", curDistanceObjectToBackOfGrabber);
+ 
     
   }  // end method initLift()
 
@@ -178,7 +205,6 @@ public class Lift extends BlocksOpModeCompanion {
   public static void stopLiftMovement() {
 
     servoLift.setPosition(liftPowerScaledNoMovement);
-    liftState = State.STOP_LIFT;
     
   }  // end method stopLiftMovement()
  
@@ -205,7 +231,7 @@ public class Lift extends BlocksOpModeCompanion {
 
     // Determine which level [Junction or Pickup] is being requesting
     // Based off of whether the Grabber is closed
-    if (grabberClosed) {
+    if (isGrabber) {
       // Grabber closed so assuming the level requested is a Junction level
       
       // if an invalid index to the Junction levels, then just return and don't do anything
@@ -329,6 +355,25 @@ public class Lift extends BlocksOpModeCompanion {
     
   }  // end method isTargetLevelHigher()
 
+
+  @ExportToBlocks (
+    heading = "Lift Info",
+    color = 255,
+    comment = "Sets telemetry to display for lift.",
+    tooltip = "Sets telemetry to display for lift."
+  )
+  /**
+   * Sets telemetry to display for lift
+   */
+  public static void setToDisplayLiftInfo() {
+    telemetry.addData("Lift Current Servo Position:", servoLift.getPosition());
+    telemetry.addData("Lift Voltage:", currentVoltage);
+
+  }  // end method setToDisplayLiftInfo()
+  
+//====================================================================================  
+//============== METHODS BELOW NO LONGER USED.  THEY BLOCK OTHER ACTIONS ============
+//====================================================================================
   // Internal function to find the next higher junction level ONLY
   // Status: NOT USED
   // A more optimal solution was coded with lift STATEs
@@ -388,12 +433,6 @@ public class Lift extends BlocksOpModeCompanion {
     
   }  // end method findNextLowerJunctionLevelVoltage()
   
-  @ExportToBlocks (
-    heading = "Move To Next Higher Junction Level",
-    color = 255,
-    comment = "Move to next higher Junction level.",
-    tooltip = "Move to next higher Junction level."
-  )
   /**
    * Move lift up one Junction level 
    * Should check to make sure not reaching high limit
@@ -437,12 +476,6 @@ public class Lift extends BlocksOpModeCompanion {
   }  // end method moveToNextHigherJunctionLevelVoltage()
 
   
-  @ExportToBlocks (
-    heading = "Move To Next Lower Junction Level",
-    color = 255,
-    comment = "Move to next lower Junction level.",
-    tooltip = "Move to next lower Junction level."
-  )
   /**
    * Move lift down one Junction level 
    * Should check to make sure not reaching low limit
@@ -486,19 +519,4 @@ public class Lift extends BlocksOpModeCompanion {
   }  // end method moveToNextLowerJunctionLevelVoltage()
 
 
-  @ExportToBlocks (
-    heading = "Lift Info",
-    color = 255,
-    comment = "Sets telemetry to display for lift.",
-    tooltip = "Sets telemetry to display for lift."
-  )
-  /**
-   * Sets telemetry to display for lift
-   */
-  public static void setToDisplayLiftInfo() {
-    telemetry.addData("Lift Current Servo Position:", servoLift.getPosition());
-    telemetry.addData("Lift Voltage:", currentVoltage);
-
-  }  // end method setToDisplayLiftInfo()
-  
 }  // end class Lift

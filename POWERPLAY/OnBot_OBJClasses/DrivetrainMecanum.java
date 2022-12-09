@@ -60,13 +60,19 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     /** Initialize drivetrain and pose
      */
     public static void initDriveTrain(String driveLeftFrontName, String driveLeftBackName, String driveRightFrontName, String driveRightBackName) {
+
+       // Save the hardware configuration names of our drive motors
+       _driveLeftFrontName = driveLeftFrontName;
+       _driveLeftBackName = driveLeftBackName;
+       _driveRightFrontName = driveRightFrontName;
+       _driveRightBackName = driveRightBackName;
+       
+       // Initialize to Config X
+       // Set our drive to the default X configuration
+       setDriveToXConfig();
        
        // Initialize our drive train motors
        initDrivetrainMotors(driveLeftFrontName, driveLeftBackName, driveRightFrontName, driveRightBackName);
-       
-       // Initialize to Config X
-        // Set our drive to the default X configuration
-        setDriveToXConfig();
        
        // Initialize our IMU for pose information
        initIMU();
@@ -93,12 +99,6 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
      *    > Set motors to brake if no power
      */
     public static void initDrivetrainMotors(String driveLeftFrontName, String driveLeftBackName, String driveRightFrontName, String driveRightBackName) {
-
-        // Save the hardware configuration names of our drive motors
-        _driveLeftFrontName = driveLeftFrontName;
-        _driveLeftBackName = driveLeftBackName;
-        _driveRightFrontName = driveRightFrontName;
-        _driveRightBackName = driveRightBackName;
         
         // All drive motor handles below were set in the setDriveToXConfig() method
         
@@ -572,6 +572,134 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
 
          return moving;
     }  // end method turnCounterClockwise()
+
+    @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
+        comment = "Moves robot forward",
+        tooltip = "Moves robot forward",
+        parameterLabels = { }
+    )
+    /**
+     * Moves the robot forward at the current power level
+     */
+    public static boolean moveForwardToPosition() {
+
+        if (getPowerLevel() >= powerThreshold) {
+            // Setting power to opposing wheels
+            driveLeftFront.setPower(powerLevel[indexPowerLevel]);
+            driveRightBack.setPower(powerLevel[indexPowerLevel]);
+            driveRightFront.setPower(powerLevel[indexPowerLevel]);
+            driveLeftBack.setPower(powerLevel[indexPowerLevel]);
+            
+            moving = true;
+            telemetry.addData("Drivetrain Movement", "Moving FORWARD");
+        } else {
+            // Not enough power requested over threshold
+            // Therefore, stopping
+            stopDrivetrain();
+            moving = false;
+        }
+        return moving;
+    }   // end method moveForwardToPosition()
+
+    @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
+        comment = "Moves robot backward",
+        tooltip = "Moves robot backward",
+        parameterLabels = {}
+    )
+    /**
+     * Moves the robot backward at the current power level
+     */
+    public static boolean moveBackwardToPosition() {
+
+         if (getPowerLevel() >= powerThreshold) {
+             
+            // Setting power to opposing wheels
+            driveLeftFront.setPower(-powerLevel[indexPowerLevel]);
+            driveRightBack.setPower(-powerLevel[indexPowerLevel]);
+            driveRightFront.setPower(-powerLevel[indexPowerLevel]);
+            driveLeftBack.setPower(-powerLevel[indexPowerLevel]);
+            
+            moving = true;
+            telemetry.addData("Drivetrain Movement", "Moving BACKWARD");
+        } else {
+            // Not enough power requested over threshold
+            // Therefore, stopping
+            stopDrivetrain();
+            moving = false;
+        }
+        return moving;
+    }   // end method moveBackwardToPosition()
+
+    @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
+        comment = "Moves robot left",
+        tooltip = "Moves robot left",
+        parameterLabels = {}
+    )
+    /**
+     * Moves robot left at current power level
+     */
+    public static boolean moveLeftToPosition() {
+         
+         if (getPowerLevel() >= powerThreshold) {
+            // Setting power to opposing wheels
+            // Setting first set of opposing wheels to positive
+            driveRightFront.setPower(powerAbsolute);
+            driveLeftBack.setPower(powerAbsolute);
+            
+            // Setting second set of opposing wheels to negative
+            driveLeftFront.setPower(-powerAbsolute);
+            driveRightBack.setPower(-powerAbsolute);
+            
+            moving = true;
+            telemetry.addData("Drivetrain Movement", "Moving LEFT");
+         } else {
+            // Not enough power requested over threshold
+            // Therefore, stopping
+            stopDrivetrain();
+            moving = false;
+        }
+        return moving;
+    }   // end method moveLeftToPosition()
+
+    @ExportToBlocks (
+        heading = "Drivetrain: Movement",
+        color = 255,
+        comment = "Moves robot right",
+        tooltip = "Moves robot right",
+        parameterLabels = {}
+    )
+    /**
+     * Moves robot right at current power level
+     */
+    public static boolean moveRightToPosition() {
+
+         if (getPowerLevel() >= powerThreshold) {
+            // Setting power to opposing wheels
+            // Setting first set of opposing wheels to positive
+            driveLeftFront.setPower(powerAbsolute);
+            driveRightBack.setPower(powerAbsolute);
+              
+            // Setting second set of opposing wheels to negative
+            driveRightFront.setPower(-powerAbsolute);
+            driveLeftBack.setPower(-powerAbsolute);
+            
+            moving = true;
+            telemetry.addData("Drivetrain Movement", "Moving RIGHT");
+         } else {
+            // Not enough power requested over threshold
+            // Therefore, stopping
+            stopDrivetrain();
+            moving = false;
+        }
+
+        return moving;
+    }   // end method moveRightToPosition()
 
     @ExportToBlocks (
         heading = "Drivetrain: Information",
