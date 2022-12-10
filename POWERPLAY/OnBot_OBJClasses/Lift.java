@@ -99,13 +99,13 @@ public class Lift extends BlocksOpModeCompanion {
 
       case LOWER_LIFT: {
         // Move down until able to reach our targetLevel or lowest limit
-		
+        
         // DO NOT LOWER LIFT IF SOMETHING IN THE GRABBER'S PATH
         if (curDistanceObjectToBackOfGrabber < distanceMinToBlockLower) {
           stopLiftMovement();               
           liftState = State.STOP_LIFT;
-		  
-		} if (currentVoltage > voltageLowest && targetLevel < currentVoltage) {
+          
+        } if (currentVoltage > voltageLowest && targetLevel < currentVoltage) {
 
           // Initiate moving down to target
           servoLift.setPosition(liftPowerScaledMoveDown);
@@ -115,7 +115,7 @@ public class Lift extends BlocksOpModeCompanion {
           telemetry.addData("Lift Current Voltage: ", currentVoltage);
 
         } else {
-			
+            
           stopLiftMovement();               
           liftState = State.STOP_LIFT;
         }
@@ -185,7 +185,7 @@ public class Lift extends BlocksOpModeCompanion {
     
     // Let's get a hardware handle on our distance sensor at the bottom of our lift
     sensor2MDistance = hardwareMap.get(DistanceSensor.class, sensor2MDistanceName);
-	
+    
     // Grab the current distance reading 
     curDistanceObjectToBackOfGrabber = sensor2MDistance.getDistance(DistanceUnit.MM);
     telemetry.addData("Distance Read", curDistanceObjectToBackOfGrabber);
@@ -231,7 +231,7 @@ public class Lift extends BlocksOpModeCompanion {
 
     // Determine which level [Junction or Pickup] is being requesting
     // Based off of whether the Grabber is closed
-    if (isGrabber) {
+    if (Grabber.isGrabberClosed()) {
       // Grabber closed so assuming the level requested is a Junction level
       
       // if an invalid index to the Junction levels, then just return and don't do anything
