@@ -94,6 +94,13 @@ public class VisionAI extends BlocksOpModeCompanion  {
     static private boolean oldLeftBumper;
     static private boolean oldRightBumper;
 
+    // Handles for each of our webcams
+    static final String constantWebcam1 = "Webcam 1";
+    static final String constantWebcam2 = "Webcam 2";
+
+    static String camViewFront;
+    static String camViewSide;
+
     /**
      * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
      * Detection engine.
@@ -108,15 +115,6 @@ public class VisionAI extends BlocksOpModeCompanion  {
     static final String constantTrackableE1 = "Red Audience Wall";
     static final String constantTrackableE6 = "Red Rear Wall";
   
-    // Handles for each of our webcams
-    static final String constantWebcam1 = "Webcam 1";
-    static final String constantWebcam2 = "Webcam 2";
-
-    static String camViewFront;
-    static String camViewSide;
-
-    static int ParkingLocationOfLabel;
-
     // Initialize our Lists for configuration settings
     static List<String> optionsInitialTilePosition; 
     static List<String> optionsTrackable;
@@ -140,7 +138,7 @@ public class VisionAI extends BlocksOpModeCompanion  {
     camViewFront = constantWebcam2;
     camViewSide = constantWebcam1;
     
-    // Initialize our lists
+    // Initialize our lists of options
     optionsInitialTilePosition = JavaUtil.createListWith();
     optionsTrackable = JavaUtil.createListWith();
     optionsCamViewFront = JavaUtil.createListWith();
@@ -173,7 +171,6 @@ public class VisionAI extends BlocksOpModeCompanion  {
     //Set information to display at next telemetry update
     telemetry.addData("camViewFront", camViewFront);
     telemetry.addData("camViewSide", camViewSide);
-    telemetry.addData("Current Tile Position", curTilePosition);
  
   } // end method initVisionAI()
 
@@ -436,6 +433,7 @@ public class VisionAI extends BlocksOpModeCompanion  {
         // should be set to the value of the images used to create the TensorFlow Object Detection model
         // (typically 16/9).
         tfod.setZoom(1.0, 16.0/9.0);
+        
       } else {
         return false;
       }
@@ -444,22 +442,37 @@ public class VisionAI extends BlocksOpModeCompanion  {
 
     }  // end method activateTensorflow() 
 
+
     @ExportToBlocks (
-      heading = "Parking Signal",
+      heading = "Vision AI",
       color = 32,
-      comment = "Looks through all the object recognitions and determine which parking location it correlates to, if any." +
-                "The parking location are for a custom signal tensorflow model.",
-       tooltip = "Returns [1,2,3] or 0 if did not recognize any signals in the line of sight."
+      comment = "Deactivate Tensorflow.",
+      tooltip = "Assumes Tensorflow has been initialized and activated."
     )
+    /**
+     * Dectivate TensorFlow Object Detection to save processing.
+     **/
+    static public boolean deactivateTensorflow(){
+
+      if (tfod != null) {
+        tfod.deactivate();
+      } else {
+        return false;
+      }
+      
+      return true;
+
+    }  // end method deactivateTensorflow() 
+
     /** Runs through all the object recognitions
      *  Compares an object label from our known custom signal labels
      *  Returns the Parking Location if Signal found.  Otherwise, returns 0.
      */
-    static public String identifyParkingLocationFromCustomSignal() {
-        String parkingLocation = "";
+    private static String identifySignal() {
+        String signal = "";
         
         if (tfod != null) {
-            doCameraSwitching();  // Detects left or right bumpers to switch cameras
+            //doCameraSwitching();  // Detects left or right bumpers to switch cameras
             List<Recognition> recognitions = tfod.getRecognitions();
             telemetry.addData("# Objects Detected", recognitions.size());
             
@@ -471,9 +484,8 @@ public class VisionAI extends BlocksOpModeCompanion  {
                 double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
                 double height = Math.abs(recognition.getTop()  - recognition.getBottom()) ;
 
-                parkingLocation = recognition.getLabel();
+                signal = recognition.getLabel();
                 
-                telemetry.addData(""," ");
                 telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
                 telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
                 telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
@@ -481,10 +493,39 @@ public class VisionAI extends BlocksOpModeCompanion  {
 
         } 
         
-        return parkingLocation;
+        return signal;
         
-    }  // end method identifyParkingLocationFromCustomSignal()
+    }  // end method identifySignal()
 
+    @ExportToBlocks (
+      heading = "Parking Signal",
+      color = 32,
+      comment = "After running through any objects recognized, determines the parking signal [1,2,3]." +
+                "The parking location are for a custom signal tensorflow model.",
+       tooltip = "Returns [1,2,3] or 0 if did not recognize any signals in the line of sight."
+    )
+    /** Runs through all the object recognitions
+     *  Compares an object label from our known custom signal labels
+     *  Returns the Parking Location if Signal found.  Otherwise, returns 0.
+     */
+    static public int identifyParkingLocation() {
+       String labelSignal = "";         // Assume we don't see anything
+       int parkingLocation = -1;  // Set as the default
+       
+       labelSignal = identifySignal();       
+    
+         for (int i = 0; i < LABELS.length; i++) {
+          if (LABELS[i].equals(labelSignal)) {
+                parkingLocation = i +1;
+          }
+       }
+       
+      telemetry.addData("Signal Label: ", labelSignal);
+      telemetry.addData("Parking Location Signal Index: ", parkingLocation);
+
+       return parkingLocation;
+
+    }  // end method identifyParkingLocation()
 
     @ExportToBlocks (
       heading = "Vision AI",
@@ -661,6 +702,83 @@ public class VisionAI extends BlocksOpModeCompanion  {
             telemetry.addData("Press LeftBumper", "to switch to Webcam 1");
         }
     }  // end method doCameraSwitching()
+    
+    @ExportToBlocks (
+      heading = "Vision AI",
+      color = 32,
+      comment = "Switches between cameras.",
+      tooltip = "On request usually by a timer from the requesting program."
+    )
+    /** Switches between a Front and Side camera. 
+     */
+    static public void switchCameras() {
+
+        if (switchableCamera.getActiveCamera().equals(webcam1)) {
+            switchableCamera.setActiveCamera(webcam2);
+        } else {
+            switchableCamera.setActiveCamera(webcam1);
+        }
+    }  // end method switchCameras()
+    
+    @ExportToBlocks (
+      heading = "Vision AI",
+      color = 32,
+      comment = "Switches to Front camera.",
+      tooltip = "Assumes the initial position has been determined and cameras configured."
+    )
+    /** Switches to Front camera. 
+     */
+    static public void switchToFront() {
+ 
+        if (camViewFront.equals(constantWebcam1) ) {
+            switchableCamera.setActiveCamera(webcam1);
+        } else {
+            switchableCamera.setActiveCamera(webcam2);
+        }
+
+        telemetry.addData("Switched Cameras:", "To Front");
+        telemetry.addData("activeCamera", camViewFront);
+
+    }  // end method switchToFront()
+    
+    @ExportToBlocks (
+      heading = "Vision AI",
+      color = 32,
+      comment = "Switches to Side camera.",
+      tooltip = "Assumes the initial position has been determined and cameras configured."
+    )
+    /** Switches to Side camera. 
+     */
+    static public void switchToSide() {
+ 
+        if (camViewSide.equals(constantWebcam1) ) {
+            switchableCamera.setActiveCamera(webcam1);
+        } else {
+            switchableCamera.setActiveCamera(webcam2);
+        }
+
+        telemetry.addData("Switched Cameras:", "Side");
+        telemetry.addData("activeCamera", camViewSide);
+
+    }  // end method switchToSide()
+
+  /*  Fixing our cameras based on initial position.    
+   */
+  static public void initCamerasBasedOnConfiguration(int index) {
+      
+    // Grab the camera setup based on our list.
+    camViewFront = (((String) JavaUtil.inListGet(optionsCamViewFront, JavaUtil.AtMode.FROM_START, (index), false)));
+    camViewSide = (((String) JavaUtil.inListGet(optionsCamViewSide, JavaUtil.AtMode.FROM_START, (index), false)));
+    // Moving forward we shouldn't have to reset the cameras unless we rotate the robot.    
+    
+    //Set information to display at next telemetry update
+    telemetry.addData("camViewFront", camViewFront);
+    telemetry.addData("camViewSide", camViewSide);
+    
+    switchToFront();
+
+  }  // end method initCamerasBasedOnConfiguration()
+
     
 }  // end class VisionAI
 

@@ -13,11 +13,12 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
 
   static String ourInitialPosition = "";
   static String curTilePosition = "";
-  static int parkingTileLocation = 0; 
-  static int index = -1;
+  static int indexOfInitialTilePosition = -1;
 
   static List<String> optionsInitialTilePosition = JavaUtil.createListWith();
-
+  static List<Integer> optionsRelativePositionForPL1 = JavaUtil.createListWith();
+  static List<Integer> optionsRelativePositionForPL2 = JavaUtil.createListWith();
+  static List<Integer> optionsRelativePositionForPL3 = JavaUtil.createListWith();
 
   @ExportToBlocks (
     heading = "Startup Configurator",
@@ -34,16 +35,28 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
     
     // Configuration settings if starting in A2
     optionsInitialTilePosition.add("A2");
+    optionsRelativePositionForPL1.add(2);
+    optionsRelativePositionForPL2.add(1);
+    optionsRelativePositionForPL3.add(0);
 
     // Configuration settings if starting in A5
     optionsInitialTilePosition.add("A5");
-
+    optionsRelativePositionForPL1.add(0);
+    optionsRelativePositionForPL2.add(1);
+    optionsRelativePositionForPL3.add(2);
+    
     // Configuration settings if starting in F2
     optionsInitialTilePosition.add("F2");
+    optionsRelativePositionForPL1.add(0);
+    optionsRelativePositionForPL2.add(1);
+    optionsRelativePositionForPL3.add(2);
 
     // Configuration settings if starting in F5
     optionsInitialTilePosition.add("F5");
-    
+    optionsRelativePositionForPL1.add(2);
+    optionsRelativePositionForPL2.add(1);
+    optionsRelativePositionForPL3.add(0);
+
     // Set information to display at next telemetry update
     telemetry.addData("Our Tile Position", ourInitialPosition);
 
@@ -70,15 +83,16 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
 
         // Find the Tile Position (eg. "A2") in our set of options which is an array.  
         // The index is the key to all the other configuration options.
-        index = optionsInitialTilePosition.indexOf(ourInitialPosition) + 1;
-        curTilePosition = (((String) JavaUtil.inListGet(optionsInitialTilePosition, JavaUtil.AtMode.FROM_START, (index - 1), false)));
+        // Starting index is 0.
+        indexOfInitialTilePosition= optionsInitialTilePosition.indexOf(ourInitialPosition);
+        curTilePosition = (((String) JavaUtil.inListGet(optionsInitialTilePosition, JavaUtil.AtMode.FROM_START, (indexOfInitialTilePosition), false)));
 
-        // TODO: VisionAI.initCamerasBasedOnConfiguration(index);
-      
+        VisionAI.initCamerasBasedOnConfiguration(indexOfInitialTilePosition);
+
         // Set information to display at the next telemetry update
-      telemetry.addData("initConfiguration: Our Initial Position", ourInitialPosition);
-      telemetry.addData("initConfiguration: index", index);
-      telemetry.addData("initConfiguration: curTilePosition", curTilePosition);
+        telemetry.addData("initConfiguration: Our Initial Position", ourInitialPosition);
+        telemetry.addData("initConfiguration: index", indexOfInitialTilePosition);
+        telemetry.addData("initConfiguration: curTilePosition", curTilePosition);
 
     }
   }  // end method initConfiguration()
@@ -87,26 +101,41 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
   @ExportToBlocks (
     heading = "Startup Configurator",
     color = 32,
-    comment = "Determines the Parking Tile Position in which we want to park",
-    tooltip = "Assumes we are heading to the column that has the stacks of cones.",
-    parameterLabels = {"Our Initial Position"}
+    comment = "Determines the Relative Parking Tile Position in which we want to park",
+    tooltip = "Relative position from tile [0] with cone stack. -1 if signal not found."
   )
    /** Read the Parking Tile Position in which we want to park
     */
-  static public int readParkingTilePosition(String ourInitialPosition) {
+  static public int readRelativeParkingLocation() {
     // ASSUMPTIONS
     // Front camera is towards Signal
     // In Init so can't move cameras
     // *********************************
-    // TODO:  index = VisionAI.identifyParkingLocationFromCustomSignal();
+    int signaledParkingLocation = -1;
+    int relativePosition = -1;
     
-    // TODO: Parking Position versus Tile Row to Park per Initial Position
+    // Let's "see" what our signal says
+    signaledParkingLocation = VisionAI.identifyParkingLocation();
     
+    if (signaledParkingLocation == 1) {
+      // Our signal is to park in Parking Location 1
+      relativePosition = (((int) JavaUtil.inListGet(optionsRelativePositionForPL1, JavaUtil.AtMode.FROM_START, (indexOfInitialTilePosition), false)));
+    } else if (signaledParkingLocation == 2) {
+      // Our signal is to park in Parking Location 2
+      relativePosition = (((int) JavaUtil.inListGet(optionsRelativePositionForPL2, JavaUtil.AtMode.FROM_START, (indexOfInitialTilePosition), false)));
+    } else if (signaledParkingLocation == 3) {
+      // Our signal is to park in Parking Location 2
+      relativePosition = (((int) JavaUtil.inListGet(optionsRelativePositionForPL3, JavaUtil.AtMode.FROM_START, (indexOfInitialTilePosition), false)));
+    } else {
+      relativePosition = -1;
+    }
+      
     // Set information to display at the next telemetry update    
-    telemetry.addData("index", index);
+    telemetry.addData("Parking Location Signal ", signaledParkingLocation);
+    telemetry.addData("Relative Parking Location from Cone Stack: ", relativePosition);
     
-    return index;
-  } // end method readParkingTilePosition()
+    return relativePosition;
+  } // end method readRelativeParkingTilePosition()
 
 
 }
