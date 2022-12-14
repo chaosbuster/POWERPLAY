@@ -97,7 +97,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
     /* Declare OpMode members. */
     private DcMotor         driveLeftFront   = null;
     private DcMotor         driveRightBack   = null;
-    
+
     private DcMotor         driveRightFront  = null;
     private DcMotor         driveLeftBack  = null;
 
@@ -154,14 +154,14 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         // Initialize the drive system variables.
         driveLeftFront  = hardwareMap.get(DcMotor.class, "driveLeftFront");
         driveRightBack  = hardwareMap.get(DcMotor.class, "driveRightBack");
-        
+
         driveRightFront = hardwareMap.get(DcMotor.class, "driveRightFront");
         driveLeftBack = hardwareMap.get(DcMotor.class, "driveLeftBack");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        
+
         // Reverse direction for our physically inverted motors
         driveLeftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         driveLeftBack.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -169,7 +169,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         // Explicitly set forward direction for our other motors
         driveRightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         driveRightBack.setDirection(DcMotorSimple.Direction.FORWARD);
-        
+
         // define initialization values for IMU, and then initialize it.
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
@@ -182,12 +182,12 @@ public class TestAutoDriveByGyro extends LinearOpMode {
 
         driveRightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         driveLeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        
+
         driveLeftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         driveRightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        
+
         driveRightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        driveLeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveLeftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Wait for the game to start (Display Gyro value while waiting)
         while (opModeInInit()) {
@@ -198,10 +198,10 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         // Set the encoders for closed loop speed control, and reset the heading.
         driveLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveRightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        
+
         driveRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        
+
         resetHeading();
 
         // Step through each leg of the path,
@@ -214,8 +214,8 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         driveLeft (DRIVE_SPEED * 0.50, 24.0, -0.0);       // Drive Left 12"  usually -degrees
         //driveStraight(DRIVE_SPEED, -24.0, 0.0);    // Drive Reverse 24"
         //driveLeft (DRIVE_SPEED * 0.4, -24.0, 0.0);       // Drive Right 12"
-        
-        //driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"        
+
+        //driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
         //turnToHeading( TURN_SPEED, -45.0);               // Turn  CW to -45 Degrees
         //holdHeading( TURN_SPEED, -45.0, 0.5);   // Hold -45 Deg heading for a 1/2 second
 
@@ -266,7 +266,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
             int moveCounts = (int)(distance * COUNTS_PER_INCH);
             targetLeftFront = driveLeftFront.getCurrentPosition() + moveCounts;
             targetRightBack = driveRightBack.getCurrentPosition() + moveCounts;
-            
+
             targetRightFront = driveRightFront.getCurrentPosition() + moveCounts;
             targetLeftBack = driveLeftBack.getCurrentPosition() + moveCounts;
 
@@ -280,7 +280,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
             // Now RUN_TO_POSITION
             driveLeftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             driveRightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            
+
             driveRightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             driveLeftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -311,7 +311,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
             moveRobot(0, 0);
             driveLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             driveRightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            
+
             driveRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             driveLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
@@ -339,22 +339,22 @@ public class TestAutoDriveByGyro extends LinearOpMode {
 
             // Determine new target position, and pass to motor controller
             int moveCounts = (int)(Math.abs(distance) * COUNTS_PER_INCH);
-            
+
             if (distance > 0) {
               targetLeftFront = driveLeftFront.getCurrentPosition() - moveCounts;
               targetRightBack = driveRightBack.getCurrentPosition() - moveCounts;
-            
+
               targetRightFront = driveRightFront.getCurrentPosition() + moveCounts;
               targetLeftBack = driveLeftBack.getCurrentPosition() + moveCounts;
-              
+
             } else {
-                
+
               targetLeftFront = driveLeftFront.getCurrentPosition() + moveCounts;
               targetRightBack = driveRightBack.getCurrentPosition() + moveCounts;
-            
+
               targetRightFront = driveRightFront.getCurrentPosition() - moveCounts;
               targetLeftBack = driveLeftBack.getCurrentPosition() - moveCounts;
-               
+
             }
 
             // Set Target FIRST, then turn on RUN_TO_POSITION
@@ -367,7 +367,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
             // Now RUN_TO_POSITION
             driveLeftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             driveRightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            
+
             driveRightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             driveLeftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -398,7 +398,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
             moveRobot(0, 0);
             driveLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             driveRightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            
+
             driveRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             driveLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
@@ -523,7 +523,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         {
             speedLeftFront /= max;
             speedRightBack /= max;
-            
+
             speedRightFront /= max;
             speedLeftBack /= max;
         }
@@ -558,7 +558,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         {
             speedLeftFront /= max;
             speedRightBack /= max;
-            
+
             speedRightFront /= max;
             speedLeftBack /= max;
         }
@@ -594,7 +594,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         {
             speedLeftFront /= max;
             speedRightBack /= max;
-            
+
             speedRightFront /= max;
             speedLeftBack /= max;
         }
@@ -617,7 +617,7 @@ public class TestAutoDriveByGyro extends LinearOpMode {
         if (straight) {
             telemetry.addData("Motion", "Drive Straight");
             telemetry.addData("Target Pos LF:RB ,  RF:LB",  "%7d:%7d  ,  %7d:%7d", targetLeftFront, targetRightBack, targetRightFront, targetLeftBack);
-            telemetry.addData("Actual Pos LF:RB ,  RF:LB",  "%7d:%7d  ,  %7d:%7d",  
+            telemetry.addData("Actual Pos LF:RB ,  RF:LB",  "%7d:%7d  ,  %7d:%7d",
                                driveLeftFront.getCurrentPosition(), driveRightBack.getCurrentPosition(),
                                driveRightFront.getCurrentPosition(), driveLeftBack.getCurrentPosition());
         } else {
