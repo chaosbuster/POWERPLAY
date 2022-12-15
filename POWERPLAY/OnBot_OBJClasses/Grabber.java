@@ -21,7 +21,9 @@ public class Grabber extends BlocksOpModeCompanion {
   private static LED redLED;
   private static DistanceSensor sensor2MDistance;
 
+  static int distanceMinToBlockLower = 120;
   static int distanceMinToPickupCone = 125;
+  static int distanceMaxToPickupCone = 155;
   static int distanceMaxToJunction = 175;
   static double curDistanceObjectToBackOfGrabber;
   
@@ -60,21 +62,27 @@ public class Grabber extends BlocksOpModeCompanion {
     
     
     // Set our LEDs based on the distance readings
-    if (curDistanceObjectToBackOfGrabber < distanceMinToPickupCone) {
-      // At the base of the lift
-      telemetry.addData("LEDs say: ", "I'm at the base of the lift.");
+    if (curDistanceObjectToBackOfGrabber < distanceMinToBlockLower) {
+      // We have something at the base of the lift
+      telemetry.addData("LEDs say: ", "Something's at the base of the lift.");
       redLED.enable(true);
       greenLED.enable(false);
       
-    } else if (curDistanceObjectToBackOfGrabber < distanceMaxToJunction && curDistanceObjectToBackOfGrabber > distanceMinToPickupCone) {
-      // Between Junction distance and PickupCone distance
-      telemetry.addData("LEDs say: ", "I'm between Junction distance and PickupCone distance.");
+    } else if (curDistanceObjectToBackOfGrabber <= distanceMaxToPickupCone && curDistanceObjectToBackOfGrabber >= distanceMinToPickupCone) {
+      // We have something within the 'PickupCone' distance
+      telemetry.addData("LEDs say: ", "Something's between Junction distance and PickupCone distance.");
+      redLED.enable(false);
+      greenLED.enable(false);
+      
+    } else if (curDistanceObjectToBackOfGrabber <= distanceMaxToJunction && curDistanceObjectToBackOfGrabber > distanceMaxToPickupCone) {
+      // We have something at the right Junction distance 
+      telemetry.addData("LEDs say: ", "Something's between Junction distance and PickupCone distance.");
       redLED.enable(false);
       greenLED.enable(true);
       
     } else {
       // Default LEDs to not showing
-      telemetry.addData("LEDs say: ", "I'm farther than the Junction distance.");
+      telemetry.addData("LEDs say: ", "I'm farther than the maximum Junction distance.");
       redLED.enable(false);
       greenLED.enable(false);
     }
@@ -102,7 +110,7 @@ public class Grabber extends BlocksOpModeCompanion {
         telemetry.addData("GRABBER State: ", "WAITING TO GRAB");
         
         // Check distance for LED change and grabbing cone
-        if (curDistanceObjectToBackOfGrabber <= distanceMinToPickupCone) {
+        if (curDistanceObjectToBackOfGrabber >= distanceMinToPickupCone && curDistanceObjectToBackOfGrabber <= distanceMaxToPickupCone ) {
           redLED.enable(true);
           closeGrabber();
           
@@ -137,7 +145,7 @@ public class Grabber extends BlocksOpModeCompanion {
         telemetry.addData("GRABBER State: ", "WAITING TO RELEASE");
         
         // Check distance for when to release based on the range for where the function could be
-        if (curDistanceObjectToBackOfGrabber < distanceMaxToJunction && curDistanceObjectToBackOfGrabber > distanceMinToPickupCone) {
+        if (curDistanceObjectToBackOfGrabber < distanceMaxToJunction && curDistanceObjectToBackOfGrabber > distanceMaxToPickupCone) {
         
           // Release the object if notice something within the range
           openGrabber();
@@ -216,7 +224,7 @@ public class Grabber extends BlocksOpModeCompanion {
       double positionGrabberMinScale = 100;
       double positionGrabberMaxScale = 200;
       double positionGrabberMaxGrip = 150;
-      double positionGrabberGoodGrip = 154;
+      double positionGrabberGoodGrip = 152;  // Initially was 154
       double positionGrabberTouchSides = 185;
       double positionGrabberClearSides = 182;
       double positionGrabberRelease = 165;  // Originally 170

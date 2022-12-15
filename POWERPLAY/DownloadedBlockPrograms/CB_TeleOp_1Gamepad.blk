@@ -205,7 +205,7 @@
 </block>
 </statement>
 <statement name="ELSE">
-<block type="misc_callJava_noReturn" id="eb,E(ZTy*Z~mUXgS29,2" disabled="true">
+<block type="misc_callJava_noReturn" id="eb,E(ZTy*Z~mUXgS29,2">
 <mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber runGrabber() void" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="0" returnType="void" color="255" heading="Run Grabber Based on State" comment="Runs grabber based on its state." tooltip="States are changed by distance sensor." accessMethod="callJava" convertReturnValue=""/>
 <field name="CLASS_NAME">Grabber</field>
 <field name="METHOD_NAME">runGrabber</field>
@@ -216,7 +216,7 @@
 <block type="comment" id="f*~BN[hMc=qkF9C6Yimf">
 <field name="COMMENT">Check for lift requests</field>
 <next>
-<block type="controls_if" id="e-5_R*VM8)!pp3~x21fl" disabled="true">
+<block type="controls_if" id="e-5_R*VM8)!pp3~x21fl">
 <mutation elseif="3" else="1"/>
 <value name="IF0">
 <block type="gamepad_getProperty_Boolean" id="jS^?$e;PIaY/{9b4Yw=n">

@@ -20,20 +20,20 @@ public class Lift extends BlocksOpModeCompanion {
   static Servo servoLift;
   
   private static DistanceSensor sensor2MDistance;
-  static int distanceMinToBlockLower = 125;
+  static int distanceMinToBlockLower = 120;
   static double curDistanceObjectToBackOfGrabber = 0;
 
   // Java class variables for detecting & controlling lift range
-  static double voltageLowest = 0.45;  // 0.45  // static variables defined across java class
-  static double voltageHighest = 1.19;  // 1.19  static variables defined across java class
+  static double voltageLowest = 0.43;  // 0.45  // static variables defined across java class
+  static double voltageHighest = 1.31;  // 1.19  static variables defined across java class
   
   // Initialize our junction lift levels
   // liftDropLevel: Range voltageLowest - voltageHighest
-  static double[] liftJunctionLevel = {0.455, 0.84, 1.189};  // {0.45, 0.84, 1.14}
+  static double[] liftJunctionLevel = {0.46, 0.92, 1.24};  // {0.45, 0.84, 1.14}
 
   // Initialize our pickup lift levels
   // Range voltageLowest - voltageHighest
-  static double[] liftPickupLevel = {0.455, 0.50, 0.56};  // {0.43, 0.47, 0.52, 0.55, 0.58}
+  static double[] liftPickupLevel = {0.45, 0.50, 0.56};  // {0.43, 0.47, 0.52, 0.55, 0.58}
 
   // Determines whether the lift is in an event driven mode of moving to a target
   static boolean liftMovingToTarget = false;
