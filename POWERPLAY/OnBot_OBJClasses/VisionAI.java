@@ -297,8 +297,7 @@ public class VisionAI extends BlocksOpModeCompanion  {
     } else {
       isVisible = false;
     }
-    telemetry.addData("Detecting", vuforiaResults.name);
-    telemetry.addData("Visible?", isVisible);
+
     return isVisible;
   }  // end method isTargetVisible()
 
