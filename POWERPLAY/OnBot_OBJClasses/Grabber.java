@@ -20,6 +20,8 @@ public class Grabber extends BlocksOpModeCompanion {
   private static LED greenLED;
   private static LED redLED;
   private static DistanceSensor sensor2MDistance;
+  
+  private static boolean justGrabbed = false;
 
   static int distanceMinToBlockLower = 120;
   static int distanceMinToPickupCone = 125;
@@ -111,13 +113,14 @@ public class Grabber extends BlocksOpModeCompanion {
         
         // Check distance for LED change and grabbing cone
         if (curDistanceObjectToBackOfGrabber >= distanceMinToPickupCone && curDistanceObjectToBackOfGrabber <= distanceMaxToPickupCone ) {
-          redLED.enable(true);
+          
           closeGrabber();
           
           grabberState = State.HOLDING_OBJECT;
           
           // Let's reset the timer that indicates how long ago we grabbed or released
           timegapForHoldingStates.reset();
+          justGrabbed = true;
                   
         }
         break;
@@ -126,15 +129,22 @@ public class Grabber extends BlocksOpModeCompanion {
       case HOLDING_OBJECT: {
 
         telemetry.addData("GRABBER State: ", "HOLDING OBJECT (Moving to mid release level)");
-        
-        // Let's move the grabber to the mid-Junction level to be ready to release
-        Lift.moveToLevelSpecified(1, true);
    
         // Let's give some time for the robot to move away from cone area
         // NOTE: If we don't do this the auto-grabber will release assuming 
         // we are in front of a junction, instead of a cone stack.
         if (timegapForHoldingStates.milliseconds() > moveWaitTime) {
+          
           grabberState = State.WAITING_TO_RELEASE;
+          justGrabbed = false;
+          
+        } else if (justGrabbed) {
+          
+          // Let's move the grabber to the mid-Junction level to be ready to release
+          Lift.moveToLevelSpecified(1, true);
+          
+          justGrabbed = false;
+          
         }
         
         break;
@@ -150,6 +160,7 @@ public class Grabber extends BlocksOpModeCompanion {
           // Release the object if notice something within the range
           openGrabber();
           
+          // Changing our state
           grabberState = State.NOT_HOLDING_OBJECT;
           
           // Let's reset the timer that indicates how long ago we grabbed or released
@@ -267,8 +278,18 @@ public class Grabber extends BlocksOpModeCompanion {
   /**
    * Closing servo/grabber enough to hold the item
    */
-  public static void closeGrabber() {      
+  public static void closeGrabber() {   
+    
+    // Close the grabber
     servoGrabber.setPosition(scaledPositionGrab);  
+    
+    // Change our state
+    grabberState = State.HOLDING_OBJECT;
+          
+    // Let's reset the timer that indicates how long ago we grabbed or released
+    timegapForHoldingStates.reset();
+    justGrabbed = true;
+
   }  // end method closeGrabber()
 
   @ExportToBlocks (
@@ -280,8 +301,18 @@ public class Grabber extends BlocksOpModeCompanion {
   /**
    * Opening servo/grabber enough to release the item
    */
-  public static void openGrabber() {      
+  public static void openGrabber() {  
+    
+    // Open the grabber
     servoGrabber.setPosition(scaledPositionRelease);
+    
+    // Changing our state
+    grabberState = State.NOT_HOLDING_OBJECT;
+          
+    // Let's reset the timer that indicates how long ago we grabbed or released
+    timegapForHoldingStates.reset();
+    justGrabbed = false;
+                  
   }  // end method openGrabber()
   
 }  // end class Grabber

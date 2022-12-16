@@ -94,6 +94,9 @@ public class Lift extends BlocksOpModeCompanion {
     switch (liftState) {
       
       case START: {
+        
+        stopLiftMovement();               
+        
         break;
       }
 
@@ -117,7 +120,6 @@ public class Lift extends BlocksOpModeCompanion {
         } else {
             
           stopLiftMovement();               
-          liftState = State.STOP_LIFT;
         }
 
         break;
@@ -147,13 +149,15 @@ public class Lift extends BlocksOpModeCompanion {
  
         } else {
           stopLiftMovement();               
-          liftState = State.STOP_LIFT;
         }
 
         break;
       }
 
       case END: {
+
+        stopLiftMovement();               
+          
         break;
       }
     }
@@ -205,6 +209,7 @@ public class Lift extends BlocksOpModeCompanion {
   public static void stopLiftMovement() {
 
     servoLift.setPosition(liftPowerScaledNoMovement);
+    liftState = State.STOP_LIFT;
     
   }  // end method stopLiftMovement()
  
