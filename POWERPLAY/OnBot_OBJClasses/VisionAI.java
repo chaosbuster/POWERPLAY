@@ -63,7 +63,7 @@ public class VisionAI extends BlocksOpModeCompanion  {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            "ATMTwqP/////AAABmbJZDQrx302NndMyOIh0wdhCgAs4qfPWCBF66qx8jDGtA1RaCQUF/nQdK1LVD+e7V1VqVnq9qCHkKRXwAnpsHT+evkaZECFu4mj3lxNFaCT91Cx6fHGzKer7kUE+7YGj+Cf5fIJqCgxB1rR+FMGRHOTBnnMojuDq/gZnyW5mJVWk/XepDHJiU51AhUSd8hvthylxaXSF5Cbpnowx7BMYHOYYA0SNWt9KgPEOjk6VblPoDzcbJjsVEvI55ZSLk3FphhWH0iBsBT7+fJzd5hHjlt+L99erhiExlAfn3FnMRoBqeSSWLWFtAnjoGvFy6upt556ziiGARTxjQGtCW3Pec6Tt5LMDPznLvIwbGUxQnU3m";
+            "";
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
