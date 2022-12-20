@@ -69,9 +69,9 @@ public class DrivetrainMecanumWithSmarts extends BlocksOpModeCompanion {
     static final double     COUNTS_PER_MOTOR_REV    = 560.0 ;   // REV HD HEX 20:1 Planetary 300 RPM 28x20 (eg: 537.7 for GoBILDA 312 RPM Yellow Jacket)
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // No External Gearing.
     static final double     WHEEL_DIAMETER_INCHES   = 2.95 ;     // For figuring circumference;  75 mm REV mecanum wheels
-    static final double     MECANUM_FACTOR_FORWARD = 0.95;     // Adjustment for theoretical calculations for FORWARD
-    static final double     MECANUM_FACTOR_BACKWARD = 0.85;     // Adjustment for theoretical calculations for BACKWARD
-    static final double     MECANUM_FACTOR_LEFT    = 1.15;     // Adjustment for theoretical calculations for LEFT 
+    static final double     MECANUM_FACTOR_FORWARD = 1.0;     // Adjustment for theoretical calculations for FORWARD
+    static final double     MECANUM_FACTOR_BACKWARD = 1.0;     // Adjustment for theoretical calculations for BACKWARD
+    static final double     MECANUM_FACTOR_LEFT    = 1.2;     // Adjustment for theoretical calculations for LEFT 
     static final double     MECANUM_FACTOR_RIGHT    = 1.2;     // Adjustment for theoretical calculations for RIGHT 
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
