@@ -164,6 +164,34 @@ public class Lift extends BlocksOpModeCompanion {
 
   }
   
+  /*
+   *  Returns whether the lift is a state of moving
+   */
+  public static boolean isLiftMoving() {
+    
+    // Return true if lift state is one in which the lift is moving, false otherwise.
+    switch (liftState) {
+      case START: {
+        return false;
+      }
+      case LOWER_LIFT: {
+        return true;
+      }
+      case STOP_LIFT: {
+        return false;
+      }
+      case RAISE_LIFT: {
+        return true;
+      }
+      case END: {
+        return false;
+      }
+    }  // end of SWITCH
+    
+    return false;
+    
+  }  // end method isLiftMoving()
+  
   
   @ExportToBlocks (
     heading = "Initialize Lift",
@@ -522,6 +550,64 @@ public class Lift extends BlocksOpModeCompanion {
     return;
     
   }  // end method moveToNextLowerJunctionLevelVoltage()
+
+  @ExportToBlocks (
+    heading = "Move Up",
+    color = 255,
+    comment = "Move Lift up.",
+    tooltip = "Move lift up."
+  )
+  /**
+   * Move lift up if not at the highest limit
+   */
+  public static double moveUp() {
+
+    // Set information to be displayed
+    telemetry.addData("Lift Power for Moving Up: ", liftPowerScaledMoveUp);
+    telemetry.addData("Lift Highest Limit: ", voltageHighest);
+
+    // Get our lastest voltage (aka lift position)
+    currentVoltage = liftVoltage.getVoltage();
+
+    if (currentVoltage <= voltageHighest) {
+      servoLift.setPosition(liftPowerScaledMoveUp);
+      currentVoltage = liftVoltage.getVoltage();
+      telemetry.addData("Lift Action:", "Moving Up");
+    } else {
+      stopLiftMovement();
+    }
+    
+    return currentVoltage;
+  }  // end method moveUp()
+
+  @ExportToBlocks (
+    heading = "Move Down",
+    color = 255,
+    comment = "Move Lift down.",
+    tooltip = "Move lift down."
+  )
+  /**
+   * Move lift down if not at the lowest limit
+   */
+  public static double moveDown() {
+
+    // Set information to be displayed
+    telemetry.addData("Lift Power for Moving Down: ", liftPowerScaledMoveDown);
+    telemetry.addData("Lift Lower Limit: ", voltageLowest);
+
+    // Get our lastest voltage (aka lift position)
+    currentVoltage = liftVoltage.getVoltage();
+
+    if (currentVoltage >= voltageLowest) {
+      servoLift.setPosition(liftPowerScaledMoveDown);
+      currentVoltage = liftVoltage.getVoltage();
+      telemetry.addData("Lift Action:", "Moving Down");
+    } else {
+      stopLiftMovement();
+    }
+    
+    return currentVoltage;
+  }  // end method moveDown()
 
 
 }  // end class Lift
