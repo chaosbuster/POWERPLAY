@@ -47,6 +47,9 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
     static BNO055IMU.Parameters imuParameters;
     static Orientation angles;
     static Acceleration gravity;
+    
+    static int ALIGNMENT_JUNCTION_ALLOWANCE = 10;
+    static double distanceCurrent, distancePrevious = 0;
 
     @ExportToBlocks (
         heading = "Drivetrain",
@@ -573,6 +576,7 @@ public class DrivetrainMecanum extends BlocksOpModeCompanion {
 
          return moving;
     }  // end method turnCounterClockwise()
+
 
     @ExportToBlocks (
         heading = "Drivetrain: Movement",
