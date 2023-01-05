@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import java.util.concurrent.TimeUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Tfod;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
@@ -64,7 +67,7 @@ public class VisionAI extends BlocksOpModeCompanion  {
      */
     private static final String VUFORIA_KEY =
             "";
-
+            
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
     private static final float mmPerInch        = 25.4f;
@@ -72,6 +75,10 @@ public class VisionAI extends BlocksOpModeCompanion  {
     private static final float halfField        = 72 * mmPerInch;
     private static final float halfTile         = 12 * mmPerInch;
     private static final float oneAndHalfTile   = 36 * mmPerInch;
+    
+    // Camera settings
+    private static final long constantCameraExp = 500;
+    private static final int constantCameraGain = 122;
 
     // Class Members
     static public OpenGLMatrix lastLocation   = null;
@@ -135,8 +142,8 @@ public class VisionAI extends BlocksOpModeCompanion  {
     // Initialize Vision
     
     // Camera handles to use
-    camViewFront = constantWebcam2;
-    camViewSide = constantWebcam1;
+    camViewFront = constantWebcam1;
+    camViewSide = constantWebcam2;
     
     // Initialize our lists of options
     optionsInitialTilePosition = JavaUtil.createListWith();
@@ -147,33 +154,33 @@ public class VisionAI extends BlocksOpModeCompanion  {
     // Configuration settings if starting in A2
     optionsInitialTilePosition.add("A2");
     optionsTrackable.add(constantTrackableB1);
-    optionsCamViewFront.add(constantWebcam1);
-    optionsCamViewSide.add(constantWebcam2);
+    optionsCamViewFront.add(constantWebcam2);
+    optionsCamViewSide.add(constantWebcam1);
     
     // Configuration settings if starting in A5
     optionsInitialTilePosition.add("A5");
     optionsTrackable.add(constantTrackableB6);
-    optionsCamViewFront.add(constantWebcam2);
-    optionsCamViewSide.add(constantWebcam1);
+    optionsCamViewFront.add(constantWebcam1);
+    optionsCamViewSide.add(constantWebcam2);
     
     // Configuration settings if starting in F2
     optionsInitialTilePosition.add("F2");
     optionsTrackable.add(constantTrackableE1);
-    optionsCamViewFront.add(constantWebcam2);
-    optionsCamViewSide.add(constantWebcam1);
+    optionsCamViewFront.add(constantWebcam1);
+    optionsCamViewSide.add(constantWebcam2);
     
     // Configuration settings if starting in F5
     optionsInitialTilePosition.add("F5");
     optionsTrackable.add(constantTrackableE6);
-    optionsCamViewFront.add(constantWebcam1);
-    optionsCamViewSide.add(constantWebcam2);
+    optionsCamViewFront.add(constantWebcam2);
+    optionsCamViewSide.add(constantWebcam1);
     
     //Set information to display at next telemetry update
     telemetry.addData("camViewFront", camViewFront);
     telemetry.addData("camViewSide", camViewSide);
  
   } // end method initVisionAI()
-
+  
   @ExportToBlocks (
     heading = "Vision AI",
     color = 32,
@@ -483,7 +490,9 @@ public class VisionAI extends BlocksOpModeCompanion  {
                 double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
                 double height = Math.abs(recognition.getTop()  - recognition.getBottom()) ;
 
-                signal = recognition.getLabel();
+                // Ignore objects detected farther away than expected for the signal
+                if (row > 250)
+                   signal = recognition.getLabel();
                 
                 telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
                 telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
@@ -553,6 +562,8 @@ public class VisionAI extends BlocksOpModeCompanion  {
         // Indicate that we wish to be able to switch cameras.
         webcam1 = hardwareMap.get(WebcamName.class, "Webcam 1");
         webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
+        
+        // Set our parameters to indicate a switchable camera
         parameters.cameraName = ClassFactory.getInstance().getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
 
         // Turn off Extended tracking.  Set this true if you want Vuforia to track beyond the target.
@@ -580,6 +591,9 @@ public class VisionAI extends BlocksOpModeCompanion  {
         // Set the active camera to Webcam 1.
         switchableCamera = (SwitchableCamera) vuforiaPOWERPLAY.getVuforiaLocalizer().getCamera();
         switchableCamera.setActiveCamera(webcam1);
+        
+        // Set camera settings: Exposure, Gain and AIPriority
+        setCameraSettings();
         
         // Load the data sets for the trackable objects. These particular data
         // sets are stored in the 'assets' part of our application.
@@ -647,6 +661,66 @@ public class VisionAI extends BlocksOpModeCompanion  {
         }
         
     }  // end method initVuforia()
+
+    static public void setCameraSettings() {
+
+        ExposureControl myExposureControl;  // declare exposure control object 
+        GainControl myGainControl;      // declare gain control object
+        boolean setGain;
+        int curGain;
+        long curExp;
+      
+        // Assign the exposure and gain control objects, to use their methods.
+        myExposureControl = switchableCamera.getControl(ExposureControl.class);
+        //myGainControl = switchableCamera.getControl(GainControl.class);
+        
+        // Change mode to Manual, in order to control directly.
+        // A non-default setting may persist in the camera, until changed again.
+        myExposureControl.setMode(ExposureControl.Mode.Manual);
+        myExposureControl.setAePriority(true);
+        
+        // update the webcam's settings
+        myExposureControl.setExposure(constantCameraExp, TimeUnit.MILLISECONDS);
+        //setGain = myGainControl.setGain(constantCameraGain);
+
+        // Retrieve from webcam its current exposure and gain values
+        curExp = myExposureControl.getExposure(TimeUnit.MILLISECONDS);
+        //curGain = myGainControl.getGain();
+        
+        // display exposure mode and starting values to user
+        telemetry.addData("\nCurrent exposure mode for WebCam 1: ", myExposureControl.getMode());
+        telemetry.addData("Current exposure value", curExp);
+        //telemetry.addData("Current gain value", curGain);
+
+        // Get to the 2nd camera
+        switchCameras();
+
+        // Assign the exposure and gain control objects, to use their methods.
+        myExposureControl = switchableCamera.getControl(ExposureControl.class);
+        //myGainControl = switchableCamera.getControl(GainControl.class);
+        
+        // Change mode to Manual, in order to control directly.
+        // A non-default setting may persist in the camera, until changed again.
+        myExposureControl.setMode(ExposureControl.Mode.Manual);
+        myExposureControl.setAePriority(true);
+        
+        // update the webcam's settings
+        myExposureControl.setExposure(constantCameraExp, TimeUnit.MILLISECONDS);
+        //setGain = myGainControl.setGain(constantCameraGain);
+
+        // Retrieve from webcam its current exposure and gain values
+        curExp = myExposureControl.getExposure(TimeUnit.MILLISECONDS);
+        //curGain = myGainControl.getGain();
+        
+        // display exposure mode and starting values to user
+        telemetry.addData("\nCurrent exposure mode for WebCam 2: ", myExposureControl.getMode());
+        telemetry.addData("Current exposure value", curExp);
+        //telemetry.addData("Current gain value", curGain);
+        
+        // Get back to the original active camera
+        switchCameras();
+        
+    }
 
     @ExportToBlocks (
       heading = "Vision AI",
