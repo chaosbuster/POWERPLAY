@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.LED;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.State;
@@ -17,8 +17,6 @@ public class Grabber extends BlocksOpModeCompanion {
   static double scaledPositionGrab;       // Calculated in the init
   static double scaledPositionRelease;    // Calculated in the init
   
-  private static LED greenLED;
-  private static LED redLED;
   private static DistanceSensor sensor2MDistance;
   
   private static boolean justGrabbed = false;
@@ -26,7 +24,7 @@ public class Grabber extends BlocksOpModeCompanion {
   static int distanceMinToBlockLower = 120;
   static int distanceMinToPickupCone = 125;
   static int distanceMaxToPickupCone = 155;
-  static int distanceMaxToJunction = 175;
+  static int distanceMaxToJunction = 170;
   static double curDistanceObjectToBackOfGrabber;
   
   static int moveWaitTime = 3000;  // Assuming 3 seconds is enough to move away from objects
@@ -60,33 +58,21 @@ public class Grabber extends BlocksOpModeCompanion {
  
     // Grab the latest distance reading at the bottom of the lift to see if anything there
     curDistanceObjectToBackOfGrabber = sensor2MDistance.getDistance(DistanceUnit.MM);
-    telemetry.addData("Distance Read", curDistanceObjectToBackOfGrabber);
-    
+    telemetry.addData("Distance Read: ", curDistanceObjectToBackOfGrabber);
     
     // Set our LEDs based on the distance readings
     if (curDistanceObjectToBackOfGrabber < distanceMinToBlockLower) {
       // We have something at the base of the lift
-      telemetry.addData("LEDs say: ", "Something's at the base of the lift.");
-      redLED.enable(true);
-      greenLED.enable(false);
-      
+      telemetry.addData("GRABBER says: ", "Something's at the base of the lift.");
     } else if (curDistanceObjectToBackOfGrabber <= distanceMaxToPickupCone && curDistanceObjectToBackOfGrabber >= distanceMinToPickupCone) {
       // We have something within the 'PickupCone' distance
-      telemetry.addData("LEDs say: ", "Something's between Junction distance and PickupCone distance.");
-      redLED.enable(false);
-      greenLED.enable(false);
-      
+      telemetry.addData("GRABBER says: ", "Something's between Junction distance and PickupCone distance.");
     } else if (curDistanceObjectToBackOfGrabber <= distanceMaxToJunction && curDistanceObjectToBackOfGrabber > distanceMaxToPickupCone) {
       // We have something at the right Junction distance 
-      telemetry.addData("LEDs say: ", "Something's between Junction distance and PickupCone distance.");
-      redLED.enable(false);
-      greenLED.enable(true);
-      
+      telemetry.addData("GRABBER says: ", "Something's between Junction distance and PickupCone distance.");
     } else {
       // Default LEDs to not showing
-      telemetry.addData("LEDs say: ", "I'm farther than the maximum Junction distance.");
-      redLED.enable(false);
-      greenLED.enable(false);
+      telemetry.addData("GRABBER says: ", "I'm farther than the maximum Junction distance.");
     }
 
     switch (grabberState) {
@@ -110,6 +96,10 @@ public class Grabber extends BlocksOpModeCompanion {
         }
 
         telemetry.addData("GRABBER State: ", "WAITING TO GRAB");
+        
+        // If lift is moving we are not going to grab our cone yet.
+        if (Lift.isLiftMoving())
+          break;
         
         // Check distance for LED change and grabbing cone
         if (curDistanceObjectToBackOfGrabber >= distanceMinToPickupCone && curDistanceObjectToBackOfGrabber <= distanceMaxToPickupCone ) {
@@ -153,6 +143,10 @@ public class Grabber extends BlocksOpModeCompanion {
       case WAITING_TO_RELEASE: {
         
         telemetry.addData("GRABBER State: ", "WAITING TO RELEASE");
+        
+        // If lift is moving we are not going to release our cone yet.
+        if (Lift.isLiftMoving())
+          break;
         
         // Check distance for when to release based on the range for where the function could be
         if (curDistanceObjectToBackOfGrabber < distanceMaxToJunction && curDistanceObjectToBackOfGrabber > distanceMaxToPickupCone) {
@@ -202,34 +196,16 @@ public class Grabber extends BlocksOpModeCompanion {
     color = 255,
     comment = "Initialize variables for our grabber.",
     tooltip = "Initialize variables for our grabber.",
-    parameterLabels = {"Grabber Servo Name", "2M Distance Sensor Name", "Green LED Name", "Red LED Name"}
+    parameterLabels = {"Grabber Servo Name", "2M Distance Sensor Name"}
   )
    /** Initialize variables for our grabber:
     *    > Hardware map handle for motors and sensors
     */
-   public static void initGrabber(String GrabberServoName, String sensor2MDistanceName, String greenLEDName, String redLEDName) {
+   public static void initGrabber(String GrabberServoName, String sensor2MDistanceName) {
       
       // Let's get a hardware handle on the servo for the grabber
       // The string provided should be the same as the name in the active hardware configuration 
-      servoGrabber = hardwareMap.get(Servo.class, GrabberServoName);;
-      
-      // Set our grabber's state to a START state.
-      grabberState = State.START;
-      
-      // Let's get a hardware handle on our distance sensor at the bottom of our lift
-      sensor2MDistance = hardwareMap.get(DistanceSensor.class, sensor2MDistanceName);
-      
-        // Grab the current distance reading 
-      curDistanceObjectToBackOfGrabber = sensor2MDistance.getDistance(DistanceUnit.MM);
-      telemetry.addData("Distance Read", curDistanceObjectToBackOfGrabber);
- 
-      // Let's get a hardware handle on the LED component
-      greenLED = hardwareMap.get(LED.class, greenLEDName);
-      redLED = hardwareMap.get(LED.class, redLEDName);
-      
-      // Turn off all the LEDs as the default
-      greenLED.enable(false);
-      redLED.enable(false);
+      servoGrabber = hardwareMap.get(Servo.class, GrabberServoName);
       
       // Prototyped values of servo positions for associated grabbing actions
       double positionGrabberMinScale = 100;
@@ -243,6 +219,16 @@ public class Grabber extends BlocksOpModeCompanion {
       // The two key servo positions that will be used 
       scaledPositionGrab = (positionGrabberGoodGrip - positionGrabberMinScale) / (positionGrabberMaxScale - positionGrabberMinScale);
       scaledPositionRelease = (positionGrabberRelease - positionGrabberMinScale) / (positionGrabberMaxScale - positionGrabberMinScale);
+      
+      // Let's get a hardware handle on our distance sensor at the bottom of our lift
+      sensor2MDistance = hardwareMap.get(DistanceSensor.class, sensor2MDistanceName);
+      
+        // Grab the current distance reading 
+      curDistanceObjectToBackOfGrabber = sensor2MDistance.getDistance(DistanceUnit.MM);
+      telemetry.addData("Distance Read: ", curDistanceObjectToBackOfGrabber);
+ 
+      // Set our grabber's state to a START state.
+      grabberState = State.START;
       
   }
 
