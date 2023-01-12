@@ -71,31 +71,49 @@ public class StartupConfigurator extends BlocksOpModeCompanion  {
   )
    /** Sets the actual robot configuration based on what cameras have seen during Init.
     */
-  static public void SetOurInitialConfiguration(String ourInitialPosition) {
+  static public String SetOurInitialConfiguration(String givenInitialPosition) {
       
     // See if we were able to determine our Initial Position  
-    if (ourInitialPosition.length() < 2) {
-      // TODO: Position not found visually
-      
+    if (givenInitialPosition.length() < 2) {
+       // Will set our configuration based on the currently active camera assumed facing forward.
+       ourInitialPosition = SetOurInitialConfigurationByActiveCamera();
     } else {
-        
-        // TODO:  Set robot configuration based on being in either a X or B position or RED or BLUE alliance
-
-        // Find the Tile Position (eg. "A2") in our set of options which is an array.  
-        // The index is the key to all the other configuration options.
-        // Starting index is 0.
-        indexOfInitialTilePosition= optionsInitialTilePosition.indexOf(ourInitialPosition);
-        curTilePosition = (((String) JavaUtil.inListGet(optionsInitialTilePosition, JavaUtil.AtMode.FROM_START, (indexOfInitialTilePosition), false)));
-
-        VisionAI.initCamerasBasedOnConfiguration(indexOfInitialTilePosition);
-
-        // Set information to display at the next telemetry update
-        telemetry.addData("initConfiguration: Our Initial Position", ourInitialPosition);
-        telemetry.addData("initConfiguration: index", indexOfInitialTilePosition);
-        telemetry.addData("initConfiguration: curTilePosition", curTilePosition);
-
+      ourInitialPosition = givenInitialPosition;
     }
-  }  // end method initConfiguration()
+        
+    // Set robot configuration based on being in either a X or B position or RED or BLUE alliance
+
+    // Find the Tile Position (eg. "A2") in our set of options which is an array.  
+    // The index is the key to all the other configuration options.
+    // Starting index is 0.
+    indexOfInitialTilePosition= optionsInitialTilePosition.indexOf(ourInitialPosition);
+    curTilePosition = (((String) JavaUtil.inListGet(optionsInitialTilePosition, JavaUtil.AtMode.FROM_START, (indexOfInitialTilePosition), false)));
+
+    VisionAI.initCamerasBasedOnConfiguration(indexOfInitialTilePosition);
+
+    // Set information to display at the next telemetry update
+    telemetry.addData("initConfiguration: Our Initial Position", ourInitialPosition);
+    telemetry.addData("initConfiguration: index", indexOfInitialTilePosition);
+    telemetry.addData("initConfiguration: curTilePosition", curTilePosition);
+    
+    return ourInitialPosition;
+
+  }  // end method SetOurInitialConfiguration()
+
+  static public String SetOurInitialConfigurationByActiveCamera() {
+      
+    // If Webcam 1, then assume X configuration and Initial tile of A5
+    if (VisionAI.getActiveCameraNum() == 1) {
+        ourInitialPosition = "A5";
+      
+    // If Webcam 2, then assume B configuration and Initial tile of A2
+    } else {
+        ourInitialPosition = "A2";
+    }
+
+    return ourInitialPosition;
+    
+  }  // end method SetOurInitialConfigurationByActiveCamera() 
 
 
   @ExportToBlocks (

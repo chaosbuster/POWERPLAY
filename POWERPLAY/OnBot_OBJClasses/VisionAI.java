@@ -68,7 +68,7 @@ public class VisionAI extends BlocksOpModeCompanion  {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            "";
+            "ATMTwqP/////AAABmbJZDQrx302NndMyOIh0wdhCgAs4qfPWCBF66qx8jDGtA1RaCQUF/nQdK1LVD+e7V1VqVnq9qCHkKRXwAnpsHT+evkaZECFu4mj3lxNFaCT91Cx6fHGzKer7kUE+7YGj+Cf5fIJqCgxB1rR+FMGRHOTBnnMojuDq/gZnyW5mJVWk/XepDHJiU51AhUSd8hvthylxaXSF5Cbpnowx7BMYHOYYA0SNWt9KgPEOjk6VblPoDzcbJjsVEvI55ZSLk3FphhWH0iBsBT7+fJzd5hHjlt+L99erhiExlAfn3FnMRoBqeSSWLWFtAnjoGvFy6upt556ziiGARTxjQGtCW3Pec6Tt5LMDPznLvIwbGUxQnU3m";
             
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
@@ -79,18 +79,18 @@ public class VisionAI extends BlocksOpModeCompanion  {
     private static final float oneAndHalfTile   = 36 * mmPerInch;
     
     // Camera settings
-    private static final long constantCameraExp = 500;
-    private static final int constantCameraGain = 122;
-	private static final int constantWhiteBalanceTemp = 5000;
+    private static final long constantCameraExp = 16;
+    private static final int constantCameraGain = 127;
+    private static final int constantWhiteBalanceTemp = 5000;
 
     // Webcam 1 settings
     private static final long cam1CameraExp = 500;
     private static final int cam1CameraGain = 122;
-	private static final int cam1WhiteBalanceTemp = 5000;
+    private static final int cam1WhiteBalanceTemp = 5000;
     // Webcam 2 settings
     private static final long cam2CameraExp = 500;
     private static final int cam2CameraGain = 122;
-	private static final int cam2WhiteBalanceTemp = 5000;
+    private static final int cam2WhiteBalanceTemp = 5000;
 
     // Class Members
     static public OpenGLMatrix lastLocation   = null;
@@ -676,12 +676,66 @@ public class VisionAI extends BlocksOpModeCompanion  {
 
     static public void setCameraSettings() {
 
+        telemetry.addData("\nCurrent Settings on ", "WebCam 1");
+        
+        setCameraExposure(constantCameraExp);   
+        // setCameraGain(constantCameraGain);
+        // setCameraWhiteBalance(constantWhiteBalanceTemp);
+
+        // Get to the 2nd camera
+        switchCameras();
+
+        setCameraExposure(constantCameraExp);   
+        //setCameraGain(constantCameraGain);
+        //setCameraWhiteBalance(constantWhiteBalanceTemp);
+
+        telemetry.addData("\nCurrent Settings on ", "WebCam 2");
+
+        // Get back to the original active camera
+        switchCameras();
+        
+    }
+
+    static public void setCameraExposure(long exposureSetting) {
+
         ExposureControl myExposureControl;  // declare exposure control object 
         long curExp;
-		
+
+        // Assign the exposure and gain control objects, to use their methods.
+        myExposureControl = switchableCamera.getControl(ExposureControl.class);
+        
+        // Change mode to Manual, in order to control directly.
+        // A non-default setting may persist in the camera, until changed again.
+        myExposureControl.setMode(ExposureControl.Mode.Manual);
+        myExposureControl.setAePriority(true);
+
+        // update the webcam's settings
+        myExposureControl.setExposure(exposureSetting, TimeUnit.MILLISECONDS);
+        
+        // Retrieve from webcam its current exposure and gain values
+        curExp = myExposureControl.getExposure(TimeUnit.MILLISECONDS);
+        
+        // display exposure mode and starting values to user
+        telemetry.addData("\nCurrent exposure mode: ", myExposureControl.getMode());
+        telemetry.addData("Current exposure value", curExp);
+    }
+
+    static public void setCameraGain(int gainSetting) {
+
         GainControl myGainControl;      // declare gain control object
         boolean setGain;
         int curGain;
+
+        myGainControl = switchableCamera.getControl(GainControl.class);
+        
+        setGain = myGainControl.setGain(gainSetting);
+        
+        curGain = myGainControl.getGain();
+
+        telemetry.addData("Current gain value", curGain);
+    }
+
+    static public void setCameraWhiteBalance(int wbTempSetting) {
 
         WhiteBalanceControl myWBControl;  // declare White Balance Control object
         int minWhiteBalanceTemp;          // temperature in degrees Kelvin (K)
@@ -692,103 +746,26 @@ public class VisionAI extends BlocksOpModeCompanion  {
         boolean wasTemperatureSet;        // did the set() operation succeed?
         boolean wasWhiteBalanceModeSet;   // did the setMode() operation succeed?
         boolean useTempLimits = true;
-		
-      
-        // Assign the exposure and gain control objects, to use their methods.
-        myExposureControl = switchableCamera.getControl(ExposureControl.class);
-        //myGainControl = switchableCamera.getControl(GainControl.class);
-		
-        // Assign the white balance control object, to use its methods.
-        //myWBControl = vuforia.getCamera().getControl(WhiteBalanceControl.class);
-        myWBControl = switchableCamera.getControl(WhiteBalanceControl.class);
-        
-        // Change mode to Manual, in order to control directly.
-        // A non-default setting may persist in the camera, until changed again.
-        myExposureControl.setMode(ExposureControl.Mode.Manual);
-        myExposureControl.setAePriority(true);
-        
-        // Set white balance mode to Manual, for direct control.
-        // A non-default setting may persist in the camera, until changed again.
-        wasWhiteBalanceModeSet = myWBControl.setMode(WhiteBalanceControl.Mode.MANUAL);
-
-        // update the webcam's settings
-        myExposureControl.setExposure(cam1CameraExp, TimeUnit.MILLISECONDS);
-		
-        //setGain = myGainControl.setGain(cam1CameraGain);
-		
-        // update the webcam's focus length setting
-        wasTemperatureSet = myWBControl.setWhiteBalanceTemperature(cam1WhiteBalanceTemp);
-            
-       // Retrieve from webcam its current exposure and gain values
-        curExp = myExposureControl.getExposure(TimeUnit.MILLISECONDS);
-        //curGain = myGainControl.getGain();
-
-        // set variable to current actual temperature, if supported
-        curWhiteBalanceTemp = myWBControl.getWhiteBalanceTemperature();
-     
-        // display exposure mode and starting values to user
-        telemetry.addData("\nCurrent exposure mode for WebCam 1: ", myExposureControl.getMode());
-        telemetry.addData("Current exposure value", curExp);
-		
-        //telemetry.addData("Current gain value", curGain);
-		
-        telemetry.addData("\nProgrammed temperature", "%d", curWhiteBalanceTemp);
-        telemetry.addData("Temperature set OK?", wasTemperatureSet);
-
-        telemetry.addData("\nCurrent white balance mode", myWBControl.getMode());
-        telemetry.addData("White balance mode set OK?", wasWhiteBalanceModeSet);
-        telemetry.update();
-
-        // Get to the 2nd camera
-        switchCameras();
-
-        // Assign the exposure and gain control objects, to use their methods.
-        myExposureControl = switchableCamera.getControl(ExposureControl.class);
-        //myGainControl = switchableCamera.getControl(GainControl.class);
         
         // Assign the white balance control object, to use its methods.
         //myWBControl = vuforia.getCamera().getControl(WhiteBalanceControl.class);
         myWBControl = switchableCamera.getControl(WhiteBalanceControl.class);
         
-        // Change mode to Manual, in order to control directly.
-        // A non-default setting may persist in the camera, until changed again.
-        myExposureControl.setMode(ExposureControl.Mode.Manual);
-        myExposureControl.setAePriority(true);
-        
         // Set white balance mode to Manual, for direct control.
         // A non-default setting may persist in the camera, until changed again.
         wasWhiteBalanceModeSet = myWBControl.setMode(WhiteBalanceControl.Mode.MANUAL);
 
-        // update the webcam's settings
-        myExposureControl.setExposure(cam2CameraExp, TimeUnit.MILLISECONDS);
-        //setGain = myGainControl.setGain(cam2CameraGain);
-
         // update the webcam's focus length setting
-        wasTemperatureSet = myWBControl.setWhiteBalanceTemperature(cam2WhiteBalanceTemp);
+        wasTemperatureSet = myWBControl.setWhiteBalanceTemperature(wbTempSetting);
             
-        // Retrieve from webcam its current exposure and gain values
-        curExp = myExposureControl.getExposure(TimeUnit.MILLISECONDS);
-        //curGain = myGainControl.getGain();
-        
         // set variable to current actual temperature, if supported
         curWhiteBalanceTemp = myWBControl.getWhiteBalanceTemperature();
      
-        // display exposure mode and starting values to user
-        telemetry.addData("\nCurrent exposure mode for WebCam 2: ", myExposureControl.getMode());
-        telemetry.addData("Current exposure value", curExp);
-		
-        //telemetry.addData("Current gain value", curGain);
-		
         telemetry.addData("\nProgrammed temperature", "%d", curWhiteBalanceTemp);
         telemetry.addData("Temperature set OK?", wasTemperatureSet);
 
         telemetry.addData("\nCurrent white balance mode", myWBControl.getMode());
         telemetry.addData("White balance mode set OK?", wasWhiteBalanceModeSet);
-        telemetry.update();
-        
-        // Get back to the original active camera
-        switchCameras();
-        
     }
 
     @ExportToBlocks (
@@ -844,6 +821,17 @@ public class VisionAI extends BlocksOpModeCompanion  {
             telemetry.addData("Press LeftBumper", "to switch to Webcam 1");
         }
     }  // end method doCameraSwitching()
+    
+    /** Switches between a Front and Side camera. 
+     */
+    static public int getActiveCameraNum() {
+
+        if (switchableCamera.getActiveCamera().equals(webcam1)) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }  // end method getActiveCamerasNum()
     
     @ExportToBlocks (
       heading = "Vision AI",
