@@ -35,7 +35,7 @@ public class DrivetrainMecanumWithSmarts extends BlocksOpModeCompanion {
     
     // Initialize our speed levels
     // powerLevel: Range 0-1.00
-    static private double[] powerLevel = {0.15, 0.50, 0.70};    
+    static private double[] powerLevel = {0.15, 0.50};    
 
     static private BNO055IMU  imu         = null;      // Expansion Hub IMU
 

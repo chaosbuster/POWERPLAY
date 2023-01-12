@@ -40,7 +40,7 @@ public class DrivetrainMecanumAdv extends BlocksOpModeCompanion {
     
     // Initialize our speed levels
     // powerLevel: Range 0-1.00
-    static private double[] powerLevel = {0.15, 0.50, 0.70};    
+    static private double[] powerLevel = {0.15, 0.50};    
     // Initialize our current power / speed to our mid-level
     static int indexPowerLevel = 1;
     static double powerAbsolute = powerLevel[indexPowerLevel];
