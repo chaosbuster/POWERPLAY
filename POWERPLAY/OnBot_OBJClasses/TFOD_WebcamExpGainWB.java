@@ -47,9 +47,9 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import java.util.List;
 
-@TeleOp(name = "W TFOD Webcam Exposure & Gain v04", group = "Webcam Controls")
+@TeleOp(name = "TFOD Webcam Exposure, Gain & White Balance", group = "Webcam Controls")
 
-public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
+public class TFOD_WebcamExpGainWB extends LinearOpMode {
   /* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains
    * the following 4 detectable objects
    *  0: Ball,
@@ -61,12 +61,11 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
    *  FreightFrenzy_BC.tflite  0: Ball,  1: Cube
    *  FreightFrenzy_DM.tflite  0: Duck,  1: Marker
    */
-    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
+    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     private static final String[] LABELS = {
-      "Ball",
-      "Cube",
-      "Duck",
-      "Marker"
+            "1 Bolt",
+            "2 Bulb",
+            "3 Panel"
     };
 
     /*
@@ -82,7 +81,7 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            //"   INSERT YOUR VUFORIA KEY HERE  ";
+            "ATMTwqP/////AAABmbJZDQrx302NndMyOIh0wdhCgAs4qfPWCBF66qx8jDGtA1RaCQUF/nQdK1LVD+e7V1VqVnq9qCHkKRXwAnpsHT+evkaZECFu4mj3lxNFaCT91Cx6fHGzKer7kUE+7YGj+Cf5fIJqCgxB1rR+FMGRHOTBnnMojuDq/gZnyW5mJVWk/XepDHJiU51AhUSd8hvthylxaXSF5Cbpnowx7BMYHOYYA0SNWt9KgPEOjk6VblPoDzcbJjsVEvI55ZSLk3FphhWH0iBsBT7+fJzd5hHjlt+L99erhiExlAfn3FnMRoBqeSSWLWFtAnjoGvFy6upt556ziiGARTxjQGtCW3Pec6Tt5LMDPznLvIwbGUxQnU3m";
             
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -109,7 +108,7 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
     boolean wasSetGainSuccessful;   // returned from setGain()
     
     boolean isAEPriorityOn = false;
-	
+    
     WhiteBalanceControl myWBControl;  // declare White Balance Control object
     int minWhiteBalanceTemp;          // temperature in degrees Kelvin (K)
     int maxWhiteBalanceTemp;
@@ -119,7 +118,7 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
     boolean wasTemperatureSet;        // did the set() operation succeed?
     boolean wasWhiteBalanceModeSet;   // did the setMode() operation succeed?
     boolean useTempLimits = true;
-    	
+        
     // *** ADD WEBCAM CONTROLS -- SECTION END ***
 
     @Override
@@ -151,9 +150,9 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
         // Assign the exposure and gain control objects, to use their methods.
         myExposureControl = vuforia.getCamera().getControl(ExposureControl.class);
         myGainControl = vuforia.getCamera().getControl(GainControl.class);
-		
+        
         // Assign the white balance control object, to use its methods.
-        myWBControl = vuforia.getCamera().getControl(WhiteBalanceControl.class);		
+        myWBControl = vuforia.getCamera().getControl(WhiteBalanceControl.class);        
 
         // get webcam exposure limits
         minExp = myExposureControl.getMinExposure(TimeUnit.MILLISECONDS);
@@ -170,7 +169,7 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
         // Retrieve from webcam its current exposure and gain values
         curExp = myExposureControl.getExposure(TimeUnit.MILLISECONDS);
         curGain = myGainControl.getGain();
-		
+        
         // set variable to current actual temperature, if supported
         curWhiteBalanceTemp = myWBControl.getWhiteBalanceTemperature();
         
@@ -180,15 +179,15 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
         
         // Set white balance mode to Manual, for direct control.
         // A non-default setting may persist in the camera, until changed again.
-        wasWhiteBalanceModeSet = myWBControl.setMode(WhiteBalanceControl.Mode.MANUAL);		
+        wasWhiteBalanceModeSet = myWBControl.setMode(WhiteBalanceControl.Mode.MANUAL);        
 
         // display exposure mode and starting values to user
         telemetry.addLine("\nTouch Start arrow to control webcam Exposure and Gain");
         telemetry.addData("\nCurrent exposure mode", myExposureControl.getMode());
         telemetry.addData("Current exposure value", curExp);
         telemetry.addData("Current gain value", curGain);
-        telemetry.addData("\nCurrent white balance mode", myWBControl.getMode());	
-		telemetry.addData("\nWhite Balance Temperature",
+        telemetry.addData("\nCurrent white balance mode", myWBControl.getMode());    
+        telemetry.addData("\nWhite Balance Temperature",
                 "Min: %d, Max: %d, Actual: %d",
                 minWhiteBalanceTemp, maxWhiteBalanceTemp,
                 myWBControl.getWhiteBalanceTemperature());
@@ -209,7 +208,7 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
                 telemetry.addData("Gain", "Min:%d, Max:%d, Current:%d", minGain, maxGain, curGain);
                 telemetry.addLine("\nAutoExposure Priority: green A ON; red B OFF");
                 telemetry.addData("AE Priority on?", isAEPriorityOn);
-				
+                
                 // display live feedback while user observes preview image
                 telemetry.addLine("Adjust temperature with blue X (cooler) & red Y (warmer)");
             
@@ -223,7 +222,7 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
 
                 telemetry.addData("\nCurrent white balance mode", myWBControl.getMode());
                 telemetry.addData("White balance mode set OK?", wasWhiteBalanceModeSet);
-				
+                
                 // *** ADD WEBCAM CONTROLS -- SECTION END ***
     
                 if (tfod != null) {
@@ -278,7 +277,7 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
                 // update the webcam's settings
                 myExposureControl.setExposure(curExp, TimeUnit.MILLISECONDS);
                 wasSetGainSuccessful = myGainControl.setGain(curGain);
-				
+                
                 // manually adjust the webcam focus variable
                 if (gamepad1.x) {                  // increase with blue X (cooler)
                     curWhiteBalanceTemp += tempIncrement;
@@ -316,7 +315,7 @@ public class W_TFOD_WebcamExpGain_v04 extends LinearOpMode {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 2");
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
