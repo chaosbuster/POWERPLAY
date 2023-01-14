@@ -125,33 +125,23 @@
 <next>
 <block type="telemetry_update" id="Bn;R8E!:O3#2%^H?x|=;">
 <next>
-<block type="controls_whileUntil" id="LkKQW(g|k;J|=387=WtB">
-<field name="MODE">UNTIL</field>
-<value name="BOOL">
-<block type="gamepad_getProperty_Boolean" id="kE{yiDaOsO125-ZR{im1">
-<field name="IDENTIFIER">gamepad1</field>
-<field name="PROP">Y</field>
-<data>{"IDENTIFIER":"gamepad1"}</data>
-</block>
-</value>
-<statement name="DO">
-<block type="telemetry_addTextData_All" id="]RZB._25.n~hJu,Vbj`Y">
-<value name="KEY">
-<shadow type="text" id="^kJ:njjnbaLj/^#2{q#m">
-<field name="TEXT">Camera Settings</field>
-</shadow>
-</value>
-<value name="TEXT">
-<shadow type="text" id="pj$F?%RCXvGVw(I8P-@R">
-<field name="TEXT">Press Y to Continue</field>
-</shadow>
-</value>
-</block>
-</statement>
-<next>
 <block type="controls_whileUntil" id="%WDHS{gu#br(xM|UR3HF">
 <field name="MODE">WHILE</field>
 <value name="BOOL">
+<block type="logic_operation" id="-n0==mL18k^*Xk0*JB$*">
+<field name="OP">AND</field>
+<value name="A">
+<block type="logic_negate" id="i@$,Y5n?5!nqk!EKuy}Y">
+<value name="BOOL">
+<block type="gamepad_getProperty_Boolean" id="O7J]d5#rjZtVYz$My,Q7">
+<field name="IDENTIFIER">gamepad1</field>
+<field name="PROP">A</field>
+<data>{"IDENTIFIER":"gamepad1"}</data>
+</block>
+</value>
+</block>
+</value>
+<value name="B">
 <block type="logic_operation" id="/kNmq3yX2^`3,)4w.(Nd">
 <field name="OP">AND</field>
 <value name="A">
@@ -175,6 +165,8 @@
 </shadow>
 <block type="variables_get" id="}03}RVGy:N2$nG9)?7SX">
 <field name="VAR" id="3+C#1+-.;6|R]:N0,l])">ourInitialTilePosition</field>
+</block>
+</value>
 </block>
 </value>
 </block>
@@ -237,22 +229,27 @@
 </block>
 </statement>
 <next>
-<block type="misc_callJava_noReturn" id="+$3Rqwm{XY`3zch-daz)">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.StartupConfigurator SetOurInitialConfiguration(java.lang.String) void" fullClassName="org.firstinspires.ftc.teamcode.StartupConfigurator" simpleName="StartupConfigurator" parameterCount="1" returnType="void" color="32" heading="Startup Configurator" comment="Sets the robot configuration based on what the cameras saw during Init." tooltip="Assumes cameras were able to see a Trackable and a Signal during Init." accessMethod="callJava" convertReturnValue="" argLabel0="Our Initial Position" argType0="java.lang.String" argAuto0=""/>
+<block type="variables_set" id="+OO$~DgmAHLd2V1gFLkv">
+<field name="VAR" id="3+C#1+-.;6|R]:N0,l])">ourInitialTilePosition</field>
+<value name="VALUE">
+<block type="misc_callJava_return" id="Bh_(gk,k1i=j_;LA)*Rp">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.StartupConfigurator SetOurInitialConfiguration(java.lang.String) java.lang.String" fullClassName="org.firstinspires.ftc.teamcode.StartupConfigurator" simpleName="StartupConfigurator" parameterCount="1" returnType="java.lang.String" color="32" heading="Startup Configurator" comment="Sets the robot configuration based on what the cameras saw during Init." tooltip="Assumes cameras were able to see a Trackable and a Signal during Init." accessMethod="callJava_String" convertReturnValue="" argLabel0="Our Initial Position" argType0="java.lang.String" argAuto0=""/>
 <field name="CLASS_NAME">StartupConfigurator</field>
 <field name="METHOD_NAME">SetOurInitialConfiguration</field>
 <comment pinned="false" h="80" w="160">Sets the robot configuration based on what the cameras saw during Init.</comment>
 <value name="ARG0">
-<shadow type="text" id="E(YK8K?yMQ_6CQw|,qP/">
+<shadow type="text" id="n/1^TXyM-,v.pq7uZN5F">
 <field name="TEXT"/>
 </shadow>
 <block type="variables_get" id="JoMB1yj]`r)OpRegk.7G">
 <field name="VAR" id="3+C#1+-.;6|R]:N0,l])">ourInitialTilePosition</field>
 </block>
 </value>
+</block>
+</value>
 <next>
 <block type="controls_if" id="wj+MfUdb_vt304dR0xUK">
-<mutation elseif="1" else="1"/>
+<mutation elseif="1"/>
 <value name="IF0">
 <block type="logic_operation" id="zsA,8r!8f?{*LvsG_84e">
 <field name="OP">OR</field>
@@ -367,11 +364,6 @@
 </next>
 </block>
 </next>
-</block>
-</statement>
-<statement name="ELSE">
-<block type="comment" id="lcD}50F}IA*^Hd*HU(#y">
-<field name="COMMENT">Set the configuration based on the active camera</field>
 </block>
 </statement>
 <next>
@@ -850,7 +842,7 @@
 <block type="comment" id="mJC2+u;qu/i1O@m%bnk{">
 <field name="COMMENT">Move towards substation</field>
 <next>
-<block type="controls_if" id="b@98!+}pezSqCL}aVSRT">
+<block type="controls_if" id="b@98!+}pezSqCL}aVSRT" disabled="true">
 <value name="IF0">
 <block type="logic_operation" id="r|-YjZV%nh|m*7`*bC%H">
 <field name="OP">AND</field>
@@ -998,7 +990,7 @@
 <block type="comment" id="E:w1{lzwS:;M=iY)~3]h">
 <field name="COMMENT">Align to low junction (FORWARD)</field>
 <next>
-<block type="controls_if" id="!s2ni/r{+zUkD=4*J;hA">
+<block type="controls_if" id="!s2ni/r{+zUkD=4*J;hA" disabled="true">
 <value name="IF0">
 <block type="logic_operation" id=",W6THn%Z4;lg$MGSdGGV">
 <field name="OP">AND</field>
@@ -1076,7 +1068,7 @@
 <block type="comment" id="!3-YYspvuws}Uh8~H(`_">
 <field name="COMMENT">ASSUMPTION: Lift is at junction height.</field>
 <next>
-<block type="controls_if" id="j)NoQ}Bms=p;~-]x/7k%">
+<block type="controls_if" id="j)NoQ}Bms=p;~-]x/7k%" disabled="true">
 <value name="IF0">
 <block type="misc_callJava_return" id="XZ-ZhaBBs0uHK5swg4bZ">
 <mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.Grabber isGrabberClosed() boolean" fullClassName="org.firstinspires.ftc.teamcode.Grabber" simpleName="Grabber" parameterCount="0" returnType="boolean" color="255" heading="Grabber" comment="Returns whether the grabber is closed." tooltip="Returns a TRUE if grabber is closed." accessMethod="callJava_boolean" convertReturnValue=""/>
@@ -1108,7 +1100,7 @@
 <block type="comment" id="!ZAaGKtQAR|xOrW8l|ac">
 <field name="COMMENT">Move FORWARD to Cone Stack's column</field>
 <next>
-<block type="controls_if" id="^,Sk7@TYW?zvXI%~b$yv" disabled="true">
+<block type="controls_if" id="^,Sk7@TYW?zvXI%~b$yv">
 <value name="IF0">
 <block type="logic_operation" id="+,y=q:Q__EE@j(xxrOTc">
 <field name="OP">AND</field>
@@ -1116,9 +1108,9 @@
 <block type="linearOpMode_opModeIsActive" id="Dp5VFrO.?ATTyxH4/$9R"/>
 </value>
 <value name="B">
-<block type="misc_callJava_return" id="HZCx?Dsu/7I@B+a89S];">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts waitingForCommand() boolean" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts" simpleName="DrivetrainMecanumWithSmarts" parameterCount="0" returnType="boolean" color="255" heading="Drivetrain" comment="Returns whether we are waiting for a command." tooltip="If waiting a long time, then check the maxRunTime setting." accessMethod="callJava_boolean" convertReturnValue=""/>
-<field name="CLASS_NAME">DrivetrainMecanumWithSmarts</field>
+<block type="misc_callJava_return" id="Ur`_Cu0:d,MTmpF=PwOE">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv waitingForCommand() boolean" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv" simpleName="DrivetrainMecanumAdv" parameterCount="0" returnType="boolean" color="255" heading="Drivetrain" comment="Returns whether we are waiting for a command." tooltip="If waiting a long time, then check the maxRunTime setting." accessMethod="callJava_boolean" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanumAdv</field>
 <field name="METHOD_NAME">waitingForCommand</field>
 <comment pinned="false" h="80" w="160">Returns whether we are waiting for a command.</comment>
 </block>
@@ -1129,23 +1121,23 @@
 <block type="comment" id="_HmlF_oed?=h/w~/}1Y_">
 <field name="COMMENT">Move FORWARD to low junction's column - 50</field>
 <next>
-<block type="misc_callJava_noReturn" id="}zDums==::_|5H9^x8IT">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts driveStraight(double,double,double) void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts" simpleName="DrivetrainMecanumWithSmarts" parameterCount="3" returnType="void" color="255" heading="Drivetrain: Smarts" comment="Drives Straight either Forward or Reverse." tooltip="Reverse movement is obtained by setting a negative distance (not speed)." accessMethod="callJava" convertReturnValue="" argLabel0="Max Drive Speed" argType0="double" argAuto0="" argLabel1="Distance" argType1="double" argAuto1="" argLabel2="Heading" argType2="double" argAuto2=""/>
-<field name="CLASS_NAME">DrivetrainMecanumWithSmarts</field>
-<field name="METHOD_NAME">driveStraight</field>
+<block type="misc_callJava_noReturn" id="):lMXUIb,IeqxAA|w)u0">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv driveStraightRTP(double,double,double) void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv" simpleName="DrivetrainMecanumAdv" parameterCount="3" returnType="void" color="255" heading="Drivetrain: Run To Position Option" comment="Drives Straight either Forward or Reverse." tooltip="Reverse movement is obtained by setting a negative distance (not speed)." accessMethod="callJava" convertReturnValue="" argLabel0="Max Drive Speed" argType0="double" argAuto0="" argLabel1="Distance" argType1="double" argAuto1="" argLabel2="Heading" argType2="double" argAuto2=""/>
+<field name="CLASS_NAME">DrivetrainMecanumAdv</field>
+<field name="METHOD_NAME">driveStraightRTP</field>
 <comment pinned="false" h="80" w="160">Drives Straight either Forward or Reverse.</comment>
 <value name="ARG0">
-<shadow type="math_number" id="!~b1_s1eQQREn:_%DUo`">
+<shadow type="math_number" id="O}bT?]E#KFA=jz%FT78Y">
 <field name="NUM">0.3</field>
 </shadow>
 </value>
 <value name="ARG1">
-<shadow type="math_number" id="18hl_Ow:MAx(j2zP=_RG">
+<shadow type="math_number" id="HWvgwc%DpZN`F#$4E_bi">
 <field name="NUM">24</field>
 </shadow>
 </value>
 <value name="ARG2">
-<shadow type="math_number" id="xGqXXr/w]+LzZ_f5W0g6">
+<shadow type="math_number" id="kF!br-lfEEEphy@,S5iq">
 <field name="NUM">0</field>
 </shadow>
 </value>
@@ -1161,9 +1153,9 @@
 <value name="B">
 <block type="logic_negate" id="OCgn=|`!Yp3`EA4@xQ7w">
 <value name="BOOL">
-<block type="misc_callJava_return" id="frAOa-Y-Y)An:%CHi%V`">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts waitingForCommand() boolean" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts" simpleName="DrivetrainMecanumWithSmarts" parameterCount="0" returnType="boolean" color="255" heading="Drivetrain" comment="Returns whether we are waiting for a command." tooltip="If waiting a long time, then check the maxRunTime setting." accessMethod="callJava_boolean" convertReturnValue=""/>
-<field name="CLASS_NAME">DrivetrainMecanumWithSmarts</field>
+<block type="misc_callJava_return" id="d%(R/ZMH@Z,2KH(qN2^[">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv waitingForCommand() boolean" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv" simpleName="DrivetrainMecanumAdv" parameterCount="0" returnType="boolean" color="255" heading="Drivetrain" comment="Returns whether we are waiting for a command." tooltip="If waiting a long time, then check the maxRunTime setting." accessMethod="callJava_boolean" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanumAdv</field>
 <field name="METHOD_NAME">waitingForCommand</field>
 <comment pinned="false" h="80" w="160">Returns whether we are waiting for a command.</comment>
 </block>
@@ -1173,9 +1165,9 @@
 </block>
 </value>
 <statement name="DO">
-<block type="misc_callJava_noReturn" id="^VblhARzXD0{u!vn|.0+">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts runDrivetrainIteration() void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts" simpleName="DrivetrainMecanumWithSmarts" parameterCount="0" returnType="void" color="255" heading="Run Drivetrain Based on State" comment="Runs drivetrain based on the state." tooltip="States are changed by calling a movement or heading." accessMethod="callJava" convertReturnValue=""/>
-<field name="CLASS_NAME">DrivetrainMecanumWithSmarts</field>
+<block type="misc_callJava_noReturn" id="nV(*zi8taZfmU}XVe`kH">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv runDrivetrainIteration() void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv" simpleName="DrivetrainMecanumAdv" parameterCount="0" returnType="void" color="255" heading="Drivetrain: Autonomous or Assists" comment="Runs drivetrain based on the state." tooltip="States are changed by calling a movement or heading." accessMethod="callJava" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanumAdv</field>
 <field name="METHOD_NAME">runDrivetrainIteration</field>
 <comment pinned="false" h="80" w="160">Runs drivetrain based on the state.</comment>
 </block>
@@ -1193,7 +1185,7 @@
 <block type="comment" id="x@Sa{c+myE?u/7]UCpOn">
 <field name="COMMENT">Move to Parking Location</field>
 <next>
-<block type="controls_if" id="{]6ryOS-?CIphMPz,wM0" disabled="true">
+<block type="controls_if" id="{]6ryOS-?CIphMPz,wM0">
 <value name="IF0">
 <block type="logic_operation" id="fQ+.*?ARQXTSS,]MykQ:">
 <field name="OP">AND</field>
@@ -1201,9 +1193,9 @@
 <block type="linearOpMode_opModeIsActive" id=")Z5KA{k$3[uj;0!6XsPy"/>
 </value>
 <value name="B">
-<block type="misc_callJava_return" id="Q72]6PD`%[]xrzQ*~OP?">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts waitingForCommand() boolean" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts" simpleName="DrivetrainMecanumWithSmarts" parameterCount="0" returnType="boolean" color="255" heading="Drivetrain" comment="Returns whether we are waiting for a command." tooltip="If waiting a long time, then check the maxRunTime setting." accessMethod="callJava_boolean" convertReturnValue=""/>
-<field name="CLASS_NAME">DrivetrainMecanumWithSmarts</field>
+<block type="misc_callJava_return" id="=zFvMfK{9s:oiq}4WX6i">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv waitingForCommand() boolean" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv" simpleName="DrivetrainMecanumAdv" parameterCount="0" returnType="boolean" color="255" heading="Drivetrain" comment="Returns whether we are waiting for a command." tooltip="If waiting a long time, then check the maxRunTime setting." accessMethod="callJava_boolean" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanumAdv</field>
 <field name="METHOD_NAME">waitingForCommand</field>
 <comment pinned="false" h="80" w="160">Returns whether we are waiting for a command.</comment>
 </block>
@@ -1472,9 +1464,9 @@
 <value name="B">
 <block type="logic_negate" id="$Xs2KC6l~yh)syYshuhQ">
 <value name="BOOL">
-<block type="misc_callJava_return" id="9%@P_bGqla!hU(c!SN8Q">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts waitingForCommand() boolean" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts" simpleName="DrivetrainMecanumWithSmarts" parameterCount="0" returnType="boolean" color="255" heading="Drivetrain" comment="Returns whether we are waiting for a command." tooltip="If waiting a long time, then check the maxRunTime setting." accessMethod="callJava_boolean" convertReturnValue=""/>
-<field name="CLASS_NAME">DrivetrainMecanumWithSmarts</field>
+<block type="misc_callJava_return" id="L6]{SIR18|8x/KJw40m9">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv waitingForCommand() boolean" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv" simpleName="DrivetrainMecanumAdv" parameterCount="0" returnType="boolean" color="255" heading="Drivetrain" comment="Returns whether we are waiting for a command." tooltip="If waiting a long time, then check the maxRunTime setting." accessMethod="callJava_boolean" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanumAdv</field>
 <field name="METHOD_NAME">waitingForCommand</field>
 <comment pinned="false" h="80" w="160">Returns whether we are waiting for a command.</comment>
 </block>
@@ -1484,9 +1476,9 @@
 </block>
 </value>
 <statement name="DO">
-<block type="misc_callJava_noReturn" id="fO.Uf;q!PeTQ-)MRvOz^">
-<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts runDrivetrainIteration() void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumWithSmarts" simpleName="DrivetrainMecanumWithSmarts" parameterCount="0" returnType="void" color="255" heading="Run Drivetrain Based on State" comment="Runs drivetrain based on the state." tooltip="States are changed by calling a movement or heading." accessMethod="callJava" convertReturnValue=""/>
-<field name="CLASS_NAME">DrivetrainMecanumWithSmarts</field>
+<block type="misc_callJava_noReturn" id="m(-rV|LWm,HRLrGFBsCc">
+<mutation createDropdownFunctionName="" methodLookupString="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv runDrivetrainIteration() void" fullClassName="org.firstinspires.ftc.teamcode.DrivetrainMecanumAdv" simpleName="DrivetrainMecanumAdv" parameterCount="0" returnType="void" color="255" heading="Drivetrain: Autonomous or Assists" comment="Runs drivetrain based on the state." tooltip="States are changed by calling a movement or heading." accessMethod="callJava" convertReturnValue=""/>
+<field name="CLASS_NAME">DrivetrainMecanumAdv</field>
 <field name="METHOD_NAME">runDrivetrainIteration</field>
 <comment pinned="false" h="80" w="160">Runs drivetrain based on the state.</comment>
 </block>
@@ -1504,8 +1496,6 @@
 </next>
 </block>
 </statement>
-</block>
-</next>
 </block>
 </next>
 </block>
