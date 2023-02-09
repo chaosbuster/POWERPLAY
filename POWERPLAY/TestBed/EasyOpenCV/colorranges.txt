@@ -1,0 +1,49 @@
+BLUE
+lower = np.array([101,50,38])
+upper = np.array([110,255,255])
+
+HEX,  R, G, B 
+283b82, 40, 59, 130
+2a3d83.  42, 61, 131
+223579,  34, 53, 121
+30428a,  48, 66, 138
+2e4088, 46,  64, 136
+213377,  33, 51, 119
+384a8e,  56, 74, 142
+lower = np.array([33,50,128])
+upper = np.array([50,255,255])
+
+Using python program, threshold_inRange.py 
+lower = np.array([30,141,60])
+upper = np.array([122,217,160])
+
+
+RED
+BEST RANGE WAS THE ARTICLE ORIGINAL
+lower = np.array([160,20,70])
+upper = np.array([190,255,255])
+
+HEX, R,  G,  B
+930a11, 147, 10, 17
+a5050d, 165, 5, 13
+b40e18, 180, 14, 24
+b10b15, 177, 11, 21
+af0a15, 175, 10, 21
+ae0a15, 175, 10, 21
+ac0a15, 172, 10, 21
+ab0914, 171, 9, 20
+lower = np.array([145,0,10])
+upper = np.array([180,20,30])
+
+Using python program, threshold_inRange.py 
+lower = np.array([164,158,136])
+upper = np.array([180,255,255])
+
+YELLOW
+## mask for yellow (15,0,0) ~ (36, 255, 255)
+lower = np.array([15,0,0])
+upper = np.array([36, 255, 255])
+
+Using python program, threshold_inRange.py 
+lower = np.array([0,162,191])
+upper = np.array([93, 255, 255])
